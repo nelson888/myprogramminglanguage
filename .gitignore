@@ -1,0 +1,10 @@
+*.jar
+
+#IDE generated files
+.idea/
+.gradle/
+out/
+target/
+build/
+gradle/
+*.iml
