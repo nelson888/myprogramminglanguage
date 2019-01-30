@@ -47,7 +47,7 @@ class Parser { //Syntax analyzer
           return N
         } else if (getCurrent().type == TokenType.BRACKET_OPEN) { //tab[n]
           accept(TokenType.BRACKET_OPEN)
-          TokenNode N = new TokenNode(t, TokenNodeType.TAB_REF, [expression()])
+          TokenNode N = new TokenNode(t, TokenNodeType.TAB_REF).withChildren(expression())
           accept(TokenType.BRACKET_CLOSE)
           return N
         }
@@ -111,7 +111,7 @@ class Parser { //Syntax analyzer
           TokenNode index = expression()
           accept(TokenType.BRACKET_CLOSE)
           accept(TokenType.SEMICOLON)
-          return new TokenNode(tokIdent, TokenNodeType.TAB_DECL, [tokIdent, index])
+          return new TokenNode(tokIdent, TokenNodeType.TAB_DECL, tokIdent.value).withChildren(index)
         }
         throw new ParsingException("Expected token $TokenType.SEMICOLON or $TokenType.ASSIGNMENT", tokIdent.l, tokIdent.c)
 

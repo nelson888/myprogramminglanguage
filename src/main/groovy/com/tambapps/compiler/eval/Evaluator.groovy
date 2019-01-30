@@ -7,7 +7,7 @@ import com.tambapps.compiler.analyzer.token.TokenNodeType
 import com.tambapps.compiler.exception.PointerException
 import com.tambapps.compiler.util.DequeMap
 import com.tambapps.compiler.util.Symbol
-//TODO ERROR WITH ARRAYS
+
 class Evaluator {
 
   private final List<TokenNode> functions
@@ -33,14 +33,15 @@ class Evaluator {
         Symbol s = dequeMap.newSymbol(node.value)
         s.slot = nbSlot++
         break
-      case TokenNodeType.TAB_DECL: //1st ident, 2nd size
-        String tabName = node.getChild(0).value
+      case TokenNodeType.TAB_DECL: //child => size
+        String tabName = node.value
         Symbol s = dequeMap.newSymbol(tabName)
         s.slot = nbSlot++
-        int size = evaluate(node.getChild(1))
+        int size = evaluate(node.getChild(0))
         for (int i = 0; i < size; i++) {
           s = dequeMap.newSymbol(i + tabName)
           s.slot = nbSlot++
+          s.value = 0
         }
         break
       case TokenNodeType.BLOC:
@@ -61,10 +62,10 @@ class Evaluator {
           }
           s = dequeMap.findSymbolWithSlot(s.value)
         } else if (left.type == TokenNodeType.TAB_REF) {
-          int index = evaluate(node.getChild(0)) + 1 //because 0 is the tab variable itself
-          s = dequeMap.findSymbol(node.value)
+          int index = evaluate(left.getChild(0)) + 1 //because 0 is the tab variable itself
+          s = dequeMap.findSymbol(left.value)
           if (s.slot + index > nbSlot) {
-            throw new PointerException("Tried to access element $index of array $e.value")
+            throw new PointerException("Tried to access element $index of array $left.value")
           }
           s = dequeMap.findSymbolWithSlot(s.slot + index)
         } else {

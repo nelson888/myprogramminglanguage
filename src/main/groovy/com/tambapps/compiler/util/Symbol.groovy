@@ -7,7 +7,8 @@ class Symbol {
   String ident
   int slot
   int nbArgs = -1
-  int value //for evaluator
+  Type type
+  def value //for evaluator
 
   @PackageScope
   Symbol(String s) {
@@ -33,5 +34,10 @@ class Symbol {
 
   Symbol copy() {
     return new Symbol(ident, slot, nbArgs, value)
+  }
+
+  enum Type {
+    STRING, CHAR, INT, FLOAT,
+    FUNCTION //TODO? function as variable?
   }
 }
