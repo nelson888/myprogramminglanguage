@@ -25,7 +25,7 @@ class TokenUtils {
     unaryMap.put(TokenType.NOT, TokenNodeType.NOT)
     unaryMap.put(TokenType.MULTIPLY, TokenNodeType.D_REF)
 
-    Map<TokenType, TokenNodeType> binaryMap = new HashMap<>().asU
+    Map<TokenType, TokenNodeType> binaryMap = new HashMap<>()
     binaryMap.put(TokenType.PLUS, TokenNodeType.PLUS_B)
     binaryMap.put(TokenType.MINUS, TokenNodeType.MINUS_B)
     binaryMap.put(TokenType.MODULO, TokenNodeType.MODULO)
@@ -113,14 +113,14 @@ class TokenUtils {
     varTypeMap.put(TokenType.TYPE_FLOAT, Symbol.Type.FLOAT)
     varTypeMap.put(TokenType.TYPE_CHAR, Symbol.Type.CHAR)
 
-    UNARY_OPERATOR_MAP = Collections.unmodifiableMap(unaryMap)
-    BINARY_OPERATOR_MAP = Collections.unmodifiableMap(binaryMap)
-    TYPE_MAP = Collections.unmodifiableMap(typeMap)
-    KEYWORDS_MAP = Collections.unmodifiableMap(keywordsMap)
-    SYMBOLS_MAP = Collections.unmodifiableMap(symbolsMap)
-    PRIORITY_MAP = Collections.unmodifiableMap(priorityMap)
-    ASSOCIATIVITY_MAP = Collections.unmodifiableMap(associativityMap)
-    OPERATOR_MAP = Collections.unmodifiableMap(operatorMap)
+    UNARY_OPERATOR_MAP = unaryMap.asImmutable()
+    BINARY_OPERATOR_MAP = binaryMap.asImmutable()
+    TYPE_MAP = typeMap.asImmutable()
+    KEYWORDS_MAP = keywordsMap.asImmutable()
+    SYMBOLS_MAP = symbolsMap.asImmutable()
+    PRIORITY_MAP = priorityMap.asImmutable()
+    ASSOCIATIVITY_MAP = associativityMap.asImmutable()
+    OPERATOR_MAP = operatorMap.asImmutable()
     VAR_TYPE_MAP = varTypeMap.asImmutable()
   }
 
