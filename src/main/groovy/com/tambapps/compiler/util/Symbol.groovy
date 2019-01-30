@@ -37,7 +37,13 @@ class Symbol {
   }
 
   enum Type {
-    STRING, CHAR, INT, FLOAT,
-    FUNCTION //TODO? function as variable?
+    STRING(""), CHAR(' ' as Character), INT(0), FLOAT(0f), ANY(0),
+    FUNCTION(null); //TODO? function as variable?
+
+    final def defaultValue
+
+    Type(def defaultValue) {
+      this.defaultValue = defaultValue
+    }
   }
 }

@@ -10,6 +10,8 @@ import com.tambapps.compiler.exception.ParsingException
 import static com.tambapps.compiler.analyzer.token.TokenUtils.ASSOCIATIVITY_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.BINARY_OPERATOR_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.PRIORITY_MAP
+import static com.tambapps.compiler.analyzer.token.TokenUtils.TYPE_MAP
+import static com.tambapps.compiler.analyzer.token.TokenUtils.VAR_TYPE_MAP
 
 class Parser { //Syntax analyzer
 
@@ -90,16 +92,21 @@ class Parser { //Syntax analyzer
   private TokenNode statement() {
     Token t = getCurrent()
     switch (t.type) {
+      case TokenType.TYPE_STRING:
+      case TokenType.TYPE_CHAR:
+      case TokenType.TYPE_INT:
+      case TokenType.FLOAT:
       case TokenType.VAR:
-        accept(TokenType.VAR)
+        moveForward()
         Token tokIdent = accept(TokenType.IDENTIFIER)
+        def declValue = [name: tokIdent.value, type: VAR_TYPE_MAP.get(t.type)]
         if (getCurrent().type == TokenType.SEMICOLON) {
           accept(TokenType.SEMICOLON)
-          return new TokenNode(tokIdent, TokenNodeType.VAR_DECL)
+          return new TokenNode(tokIdent, TokenNodeType.VAR_DECL, declValue)
         } else if (getCurrent().type == TokenType.ASSIGNMENT) { //var ident = expr;
           Token assignToken = accept(TokenType.ASSIGNMENT)
           TokenNode seq = new TokenNode(assignToken, TokenNodeType.SEQ)
-          TokenNode declTok = new TokenNode(tokIdent, TokenNodeType.VAR_DECL)
+          TokenNode declTok = new TokenNode(tokIdent, TokenNodeType.VAR_DECL, declValue)
           TokenNode value = expression()
           TokenNode assignTok = new TokenNode(assignToken, TokenNodeType.ASSIGNMENT, null)
           assignTok.addChildren(new TokenNode(tokIdent, TokenNodeType.VAR_REF, [name: tokIdent.value]), value)
@@ -111,7 +118,7 @@ class Parser { //Syntax analyzer
           TokenNode index = expression()
           accept(TokenType.BRACKET_CLOSE)
           accept(TokenType.SEMICOLON)
-          return new TokenNode(tokIdent, TokenNodeType.TAB_DECL, tokIdent.value).withChildren(index)
+          return new TokenNode(tokIdent, TokenNodeType.TAB_DECL, declValue).withChildren(index)
         }
         throw new ParsingException("Expected token $TokenType.SEMICOLON or $TokenType.ASSIGNMENT", tokIdent.l, tokIdent.c)
 

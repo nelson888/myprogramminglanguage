@@ -30,18 +30,19 @@ class Evaluator {
   void process(TokenNode node) throws PointerException {
     switch (node.type) {
       case TokenNodeType.VAR_DECL:
-        Symbol s = dequeMap.newSymbol(node.value)
+        Symbol s = dequeMap.newSymbol(node.value.name)
         s.slot = nbSlot++
         break
       case TokenNodeType.TAB_DECL: //child => size
-        String tabName = node.value
+        String tabName = node.value.name
+        def defaultValue = node.value.type.defaultValue
         Symbol s = dequeMap.newSymbol(tabName)
         s.slot = nbSlot++
         int size = evaluate(node.getChild(0))
         for (int i = 0; i < size; i++) {
           s = dequeMap.newSymbol(i + tabName)
           s.slot = nbSlot++
-          s.value = 0
+          s.value = defaultValue
         }
         break
       case TokenNodeType.BLOC:

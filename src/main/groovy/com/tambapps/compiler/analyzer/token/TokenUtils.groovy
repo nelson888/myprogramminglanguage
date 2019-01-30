@@ -112,6 +112,7 @@ class TokenUtils {
     varTypeMap.put(TokenType.TYPE_INT, Symbol.Type.INT)
     varTypeMap.put(TokenType.TYPE_FLOAT, Symbol.Type.FLOAT)
     varTypeMap.put(TokenType.TYPE_CHAR, Symbol.Type.CHAR)
+    varTypeMap.put(TokenType.VAR, Symbol.Type.ANY)
 
     UNARY_OPERATOR_MAP = unaryMap.asImmutable()
     BINARY_OPERATOR_MAP = binaryMap.asImmutable()
