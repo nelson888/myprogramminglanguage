@@ -10,7 +10,6 @@ import com.tambapps.compiler.exception.ParsingException
 import static com.tambapps.compiler.analyzer.token.TokenUtils.ASSOCIATIVITY_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.BINARY_OPERATOR_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.PRIORITY_MAP
-import static com.tambapps.compiler.analyzer.token.TokenUtils.TYPE_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.VAR_TYPE_MAP
 
 class Parser { //Syntax analyzer
