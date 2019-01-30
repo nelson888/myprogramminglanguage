@@ -12,6 +12,9 @@ enum TokenType {
   PARENT_OPEN('('), PARENT_CLOSE(')'), COMMA(','), SEMICOLON(';'), ACCOLADE_OPEN('{'), ACCOLADE_CLOSE('}'), BRACKET_OPEN('['), BRACKET_CLOSE(']'),
   IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'),
   VAR('var'),
+  STRING, CHAR, INT, FLOAT,
+  //TODO parse string, int, float vars
+  TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'),
   END_OF_FILE;
 
   final String value
