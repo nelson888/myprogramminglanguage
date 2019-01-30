@@ -1,5 +1,7 @@
 package com.tambapps.compiler.analyzer.token
 
+import com.tambapps.compiler.util.Symbol
+
 class TokenUtils {
 
   static final int LEFT = 0
@@ -14,6 +16,7 @@ class TokenUtils {
   static final Map<TokenType, TokenNodeType> TYPE_MAP
   static final Map<TokenType, Integer> PRIORITY_MAP
   static final Map<TokenType, Integer> ASSOCIATIVITY_MAP
+  static final Map<TokenType, Symbol.Type> VAR_TYPE_MAP
 
   static {
     Map<TokenType, TokenNodeType> unaryMap = new HashMap<>()
@@ -22,7 +25,7 @@ class TokenUtils {
     unaryMap.put(TokenType.NOT, TokenNodeType.NOT)
     unaryMap.put(TokenType.MULTIPLY, TokenNodeType.D_REF)
 
-    Map<TokenType, TokenNodeType> binaryMap = new HashMap<>()
+    Map<TokenType, TokenNodeType> binaryMap = new HashMap<>().asU
     binaryMap.put(TokenType.PLUS, TokenNodeType.PLUS_B)
     binaryMap.put(TokenType.MINUS, TokenNodeType.MINUS_B)
     binaryMap.put(TokenType.MODULO, TokenNodeType.MODULO)
@@ -104,6 +107,12 @@ class TokenUtils {
       }
     }
 
+    def varTypeMap = new HashMap<TokenType, Symbol.Type>()
+    varTypeMap.put(TokenType.TYPE_STRING, Symbol.Type.STRING)
+    varTypeMap.put(TokenType.TYPE_INT, Symbol.Type.INT)
+    varTypeMap.put(TokenType.TYPE_FLOAT, Symbol.Type.FLOAT)
+    varTypeMap.put(TokenType.TYPE_CHAR, Symbol.Type.CHAR)
+
     UNARY_OPERATOR_MAP = Collections.unmodifiableMap(unaryMap)
     BINARY_OPERATOR_MAP = Collections.unmodifiableMap(binaryMap)
     TYPE_MAP = Collections.unmodifiableMap(typeMap)
@@ -112,15 +121,12 @@ class TokenUtils {
     PRIORITY_MAP = Collections.unmodifiableMap(priorityMap)
     ASSOCIATIVITY_MAP = Collections.unmodifiableMap(associativityMap)
     OPERATOR_MAP = Collections.unmodifiableMap(operatorMap)
+    VAR_TYPE_MAP = varTypeMap.asImmutable()
   }
 
 
   private static int intBool(boolean b) {
     return b ? 1 : 0
-  }
-
-  private static int power(a, b) {
-    //TODO
   }
 
 }
