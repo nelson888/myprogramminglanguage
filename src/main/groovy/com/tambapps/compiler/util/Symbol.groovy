@@ -51,6 +51,7 @@ class Symbol {
     }
 
     boolean isType(def value) {
+      if (this == ANY) return true
       switch (value.getClass()) {
         case Integer:
         case Character:
@@ -61,6 +62,10 @@ class Symbol {
           return this == STRING
       }
       return false
+    }
+
+    boolean isNumber() {
+      return this in [INT, CHAR, FLOAT]
     }
 
     boolean isNode(TokenNodeType type) {

@@ -26,21 +26,21 @@ class ExpressionOptimizer implements NodeOptimizer {
       TokenNode arg1 = node.getChild(0) //decl here and not above because we must update value of node after optimizing it
       TokenNode arg2 = node.getChild(1)
       if (isConstant(arg1) && isConstant(arg2)) {
-        parent.replaceChild(node, new TokenNode(node, TokenNodeType.CONSTANT,
+        parent.replaceChild(node, new TokenNode(node, TokenNodeType.INT,
             OPERATOR_MAP.get(node.type).call(arg1.value, arg2.value)))
       }
     } else if (node.type.unaryOperator) {
       optimizeNode(node, node.getChild(0))
       TokenNode arg = node.getChild(0)
       if (isConstant(arg)) {
-        parent.replaceChild(node, new TokenNode(node, TokenNodeType.CONSTANT,
+        parent.replaceChild(node, new TokenNode(node, TokenNodeType.INT,
             OPERATOR_MAP.get(node.type).call(arg.value)))
       }
     }
   }
 
   private static boolean isConstant(TokenNode node) {
-    return node.type == TokenNodeType.CONSTANT
+    return node.type == TokenNodeType.INT
   }
 
 }

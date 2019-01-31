@@ -31,6 +31,9 @@ class Parser { //Syntax analyzer
     Token t = getCurrent()
     moveForward()
     switch (t.type) {
+      case TokenType.STRING:
+      case TokenType.CHAR:
+      case TokenType.FLOAT:
       case TokenType.INT:
         return new TokenNode(t)
       case TokenType.IDENTIFIER:

@@ -43,7 +43,6 @@ class TokenUtils {
     binaryMap.put(TokenType.ASSIGNMENT, TokenNodeType.ASSIGNMENT)
 
     Map<TokenType, TokenNodeType> typeMap = new HashMap<>()
-    typeMap.put(TokenType.INT, TokenNodeType.CONSTANT)
     typeMap.put(TokenType.IDENTIFIER, TokenNodeType.VAR_REF)
     typeMap.put(TokenType.IF, TokenNodeType.COND)
     typeMap.put(TokenType.ACCOLADE_OPEN, TokenNodeType.BLOC)
@@ -51,6 +50,10 @@ class TokenUtils {
     typeMap.put(TokenType.FOR, TokenNodeType.SEQ)
     typeMap.put(TokenType.PRINT, TokenNodeType.PRINT)
     typeMap.put(TokenType.RETURN, TokenNodeType.RETURN)
+    typeMap.put(TokenType.INT, TokenNodeType.INT)
+    typeMap.put(TokenType.FLOAT, TokenNodeType.FLOAT)
+    typeMap.put(TokenType.CHAR, TokenNodeType.CHAR)
+    typeMap.put(TokenType.STRING, TokenNodeType.STRING)
 
     Map<TokenType, Integer> priorityMap = new HashMap<>()
     priorityMap.put(TokenType.POWER, 1)

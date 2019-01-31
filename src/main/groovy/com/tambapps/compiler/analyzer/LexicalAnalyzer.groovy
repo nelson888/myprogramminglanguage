@@ -44,6 +44,9 @@ class LexicalAnalyzer {
         String match = matcher.group(GROUP + i) //group 0 is entire pattern
         if (match != null) {
           if (!t.removable) {
+            if (t == TokenType.CHAR && match.size() != 3) {
+              throw new LexicalException("$match is not a character", l ,c)
+            }
             tokens.add(new Token(l, c, t.matchMap(match), t))
           }
           if (t == TokenType.LINE_BREAK) {

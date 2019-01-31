@@ -22,6 +22,10 @@ class LexicalAnalyzerTest extends GroovyTestCase {
   }
 
   void testExpressions() {
+    if (true) {
+      println(5 % 3.2)
+      return
+    }
     List<String> test = [
         '4 + 2',
         '25--4',

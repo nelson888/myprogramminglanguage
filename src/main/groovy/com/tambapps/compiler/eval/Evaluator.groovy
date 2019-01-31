@@ -1,6 +1,7 @@
 package com.tambapps.compiler.eval
 
-import com.tambapps.compiler.exception.SemanticException
+import com.tambapps.compiler.exception.NoSuchOperatorException
+
 import com.tambapps.compiler.exception.WrongTypeException
 
 import static com.tambapps.compiler.analyzer.token.TokenUtils.OPERATOR_MAP
@@ -66,14 +67,14 @@ class Evaluator {
         if (left.type == TokenNodeType.D_REF) {
           s = dequeMap.findSymbol(left.getChild(0).value)
           if (s.slot > nbSlot) {
-            throw new PointerException("Pointed variable with address $s.value doesn't exist")
+            throw new PointerException("Pointed variable with address $s.value doesn't exist", node)
           }
           s = dequeMap.findSymbolWithSlot(s.value)
         } else if (left.type == TokenNodeType.TAB_REF) {
           int index = evaluate(left.getChild(0)) + 1 //because 0 is the tab variable itself
           s = dequeMap.findSymbol(left.value)
           if (s.slot + index > nbSlot) {
-            throw new PointerException("Tried to access element $index of array $left.value")
+            throw new PointerException("Tried to access element $index of array $left.value", node)
           }
           s = dequeMap.findSymbolWithSlot(s.slot + index)
         } else {
@@ -132,17 +133,25 @@ class Evaluator {
   }
 
   private def evaluate(TokenNode e) { //evaluates an expression
-    if (e.type.isUnaryOperator()) {
+    if (e.type.unaryOperator) {
       def arg = evaluate(e.getChild(0))
+      Type type = Type.toType(arg)
+      if (!e.type.canOperate(type)) {
+        throw new NoSuchOperatorException(e.type, type, e)
+      }
       return OPERATOR_MAP.get(e.type).call(arg)
     } else if (e.type.binaryOperator) {
       def arg1 = evaluate(e.getChild(0))
       def arg2 = evaluate(e.getChild(1))
+      List<Type> types = [arg1, arg2].collect { v -> Type.toType(v)}
+      if (!e.type.canOperate(*types)) {
+        throw new NoSuchOperatorException(e.type, *types, e)
+      }
       return OPERATOR_MAP.get(e.type).call(arg1, arg2)
+    } else if (e.type.value) {
+      return e.value
     }
     switch (e.type) {
-      case TokenNodeType.CONSTANT:
-        return e.value
       case TokenNodeType.VAR_REF:
         return dequeMap.findSymbol(e.value).value
       case TokenNodeType.D_REF:
@@ -151,7 +160,7 @@ class Evaluator {
         int index = evaluate(e.getChild(0)) + 1 //because 0 is the tab variable itself
         Symbol s = dequeMap.findSymbol(e.value)
         if (s.slot + index > nbSlot) {
-          throw new PointerException("Tried to access element $index of array $e.value")
+          throw new PointerException("Tried to access element $index of array $e.value", node)
         }
         Symbol pointedSymbol = dequeMap.findSymbolWithSlot(s.slot + index)
         return pointedSymbol.value
@@ -191,32 +200,6 @@ class Evaluator {
     return returnValue
   }
 
-  private void checkExpressionType(Type type, TokenNode e) {
-    switch (type) {
-      case Type.CHAR:
-      case Type.INT:
-      case Type.FLOAT:
-        if (e.type.isUnaryOperator()) {
-          checkExpressionType(type, e.getChild(0))
-        } else if (e.type.isBinaryOperator()) {
-          checkExpressionType(type, e.getChild(0))
-          checkExpressionType(type, e.getChild(1))
-        } else if (!isOfType(type, e)) {
-          throw new SemanticException("Expected element of type $type", e.l, e.c)
-        }
-        break
-      case Type.STRING:
-        if (e.type.isUnaryOperator()) {
-          throw new SemanticException("There isn't any operator for String", e.l, e.c)
-        } else if (e.type.isBinaryOperator() && !e.type.stringOperator) {
-          throw new SemanticException("$e.type isn't an operator for String", e.l, e.c)
-        } else if (!isOfType(type, e)) {
-          throw new WrongTypeException(type, e)
-        }
-        break
-    }
-  }
-
   private void checkNumber(TokenNode n) {
     if (n.type.isUnaryOperator()) {
       checkNumber(n.getChild(0))
@@ -224,7 +207,7 @@ class Evaluator {
       checkNumber(n.getChild(0))
       checkNumber(n.getChild(1))
     } else if (!isOfType(Type.INT, n) && !isOfType(Type.FLOAT, n)) {
-      throw new SemanticException("Expected number", n.l, n.c)
+      throw new WrongTypeException("Expected number", n.l, n.c)
     }
   }
 

@@ -17,7 +17,7 @@ class TestTokenNode extends TokenNode {
   }
 
   TestTokenNode(int value) {
-    super(BASE_TOKEN, TokenNodeType.CONSTANT, value)
+    super(BASE_TOKEN, TokenNodeType.INT, value)
   }
 
   @Override

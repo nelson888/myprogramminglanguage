@@ -81,7 +81,7 @@ class CodeGenerator {
           genCode(node.getChild(i))
         }
         break
-      case TokenNodeType.CONSTANT:
+      case TokenNodeType.INT:
         println("$PUSH_I $node.value")
         break
       case TokenNodeType.DROP:
