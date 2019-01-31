@@ -31,7 +31,7 @@ class Parser { //Syntax analyzer
     Token t = getCurrent()
     moveForward()
     switch (t.type) {
-      case TokenType.CONSTANT:
+      case TokenType.INT:
         return new TokenNode(t)
       case TokenType.IDENTIFIER:
         if (getCurrent().type == TokenType.PARENT_OPEN) {

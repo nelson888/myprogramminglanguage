@@ -43,7 +43,7 @@ class TokenUtils {
     binaryMap.put(TokenType.ASSIGNMENT, TokenNodeType.ASSIGNMENT)
 
     Map<TokenType, TokenNodeType> typeMap = new HashMap<>()
-    typeMap.put(TokenType.CONSTANT, TokenNodeType.CONSTANT)
+    typeMap.put(TokenType.INT, TokenNodeType.CONSTANT)
     typeMap.put(TokenType.IDENTIFIER, TokenNodeType.VAR_REF)
     typeMap.put(TokenType.IF, TokenNodeType.COND)
     typeMap.put(TokenType.ACCOLADE_OPEN, TokenNodeType.BLOC)
