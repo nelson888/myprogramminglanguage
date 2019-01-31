@@ -160,7 +160,7 @@ class Evaluator {
         int index = evaluate(e.getChild(0)) + 1 //because 0 is the tab variable itself
         Symbol s = dequeMap.findSymbol(e.value)
         if (s.slot + index > nbSlot) {
-          throw new PointerException("Tried to access element $index of array $e.value", node)
+          throw new PointerException("Tried to access element $index of array $e.value", e)
         }
         Symbol pointedSymbol = dequeMap.findSymbolWithSlot(s.slot + index)
         return pointedSymbol.value
