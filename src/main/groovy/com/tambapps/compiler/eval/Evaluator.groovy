@@ -199,27 +199,4 @@ class Evaluator {
   Integer getReturnValue() {
     return returnValue
   }
-
-  private void checkNumber(TokenNode n) {
-    if (n.type.isUnaryOperator()) {
-      checkNumber(n.getChild(0))
-    } else if (n.type.isBinaryOperator()) {
-      checkNumber(n.getChild(0))
-      checkNumber(n.getChild(1))
-    } else if (!isOfType(Type.INT, n) && !isOfType(Type.FLOAT, n)) {
-      throw new WrongTypeException("Expected number", n.l, n.c)
-    }
-  }
-
-  private boolean isOfType(Type type, TokenNode token) {
-    return type.isNode(token.type) || isVarOfType(type, token)
-  }
-
-  private boolean isVarOfType(Type type, TokenNode token) {
-    if (token.type == TokenNodeType.VAR_REF) {
-      Symbol symbol = dequeMap.findSymbol(token.value.name)
-      return symbol.type == type
-    }
-    return false
-  }
 }
