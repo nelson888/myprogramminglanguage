@@ -1,5 +1,8 @@
 package com.tambapps.compiler.eval
 
+import com.tambapps.compiler.exception.SemanticException
+import com.tambapps.compiler.exception.WrongTypeException
+
 import static com.tambapps.compiler.analyzer.token.TokenUtils.OPERATOR_MAP
 
 import com.tambapps.compiler.analyzer.token.TokenNode
@@ -7,13 +10,14 @@ import com.tambapps.compiler.analyzer.token.TokenNodeType
 import com.tambapps.compiler.exception.PointerException
 import com.tambapps.compiler.util.DequeMap
 import com.tambapps.compiler.util.Symbol
+import com.tambapps.compiler.util.Symbol.Type
 
 class Evaluator {
 
   private final List<TokenNode> functions
   private final Closure printer
   private DequeMap dequeMap
-  private Integer returnValue = null
+  private def returnValue = null
   private int nbSlot = 0
 
 
@@ -32,17 +36,20 @@ class Evaluator {
       case TokenNodeType.VAR_DECL:
         Symbol s = dequeMap.newSymbol(node.value.name)
         s.slot = nbSlot++
+        s.type = node.value.type
         break
       case TokenNodeType.TAB_DECL: //child => size
         String tabName = node.value.name
         def defaultValue = node.value.type.defaultValue
         Symbol s = dequeMap.newSymbol(tabName)
         s.slot = nbSlot++
-        int size = evaluate(node.getChild(0))
+        s.type = node.value.type
+        int size = evaluate(node.getChild(0), Type.INT)
         for (int i = 0; i < size; i++) {
           s = dequeMap.newSymbol(i + tabName)
           s.slot = nbSlot++
           s.value = defaultValue
+          s.type = node.value.type
         }
         break
       case TokenNodeType.BLOC:
@@ -55,7 +62,7 @@ class Evaluator {
       case TokenNodeType.ASSIGNMENT:
         TokenNode left = node.getChild(0)
         Symbol s
-        int value = evaluate(node.getChild(1))
+        def value = evaluate(node.getChild(1))
         if (left.type == TokenNodeType.D_REF) {
           s = dequeMap.findSymbol(left.getChild(0).value)
           if (s.slot > nbSlot) {
@@ -72,12 +79,14 @@ class Evaluator {
         } else {
           s = dequeMap.findSymbol(left.value)
         }
+        if (!s.type.isType(value)) {
+          throw new WrongTypeException(s.type, value, node)
+        }
         s.value = value
         break
       case TokenNodeType.COND:
         TokenNode condition = node.getChild(0)
-        int test =  evaluate(condition)
-        if (test) { //non zero numbers are truthy
+        if (evaluate(condition)) {
           process(node.getChild(1))
         } else if (node.nbChildren() > 2) {
           process(node.getChild(2))
@@ -86,10 +95,8 @@ class Evaluator {
       case TokenNodeType.LOOP:
         TokenNode condNode = node.getChild(0)
         TokenNode testNode = condNode.getChild(0)
-        int test = evaluate(testNode)
-        while (test) {
+        while (evaluate(testNode)) {
           process(condNode.getChild(1))
-          test = evaluate(testNode)
         }
         break
       case TokenNodeType.RETURN:
@@ -116,7 +123,15 @@ class Evaluator {
     }
   }
 
-  private Integer evaluate(TokenNode e) { //evaluates an expression
+  private def evaluate(TokenNode n, Type type) {
+    def value = evaluate(n)
+    if (!type.isType(value)) {
+      throw new WrongTypeException(type, value, n)
+    }
+    return value
+  }
+
+  private def evaluate(TokenNode e) { //evaluates an expression
     if (e.type.isUnaryOperator()) {
       def arg = evaluate(e.getChild(0))
       return OPERATOR_MAP.get(e.type).call(arg)
@@ -176,14 +191,52 @@ class Evaluator {
     return returnValue
   }
 
-  private power(int a, int n) {
-    if (n == 0) return 1
-    if (n == 1) return a
-    if (n % 2 == 0) {
-      int p = power(a, n / 2)
-      return p * p
+  private void checkExpressionType(Type type, TokenNode e) {
+    switch (type) {
+      case Type.CHAR:
+      case Type.INT:
+      case Type.FLOAT:
+        if (e.type.isUnaryOperator()) {
+          checkExpressionType(type, e.getChild(0))
+        } else if (e.type.isBinaryOperator()) {
+          checkExpressionType(type, e.getChild(0))
+          checkExpressionType(type, e.getChild(1))
+        } else if (!isOfType(type, e)) {
+          throw new SemanticException("Expected element of type $type", e.l, e.c)
+        }
+        break
+      case Type.STRING:
+        if (e.type.isUnaryOperator()) {
+          throw new SemanticException("There isn't any operator for String", e.l, e.c)
+        } else if (e.type.isBinaryOperator() && !e.type.stringOperator) {
+          throw new SemanticException("$e.type isn't an operator for String", e.l, e.c)
+        } else if (!isOfType(type, e)) {
+          throw new WrongTypeException(type, e)
+        }
+        break
     }
-    return a * power(a, n - 1)
   }
 
+  private void checkNumber(TokenNode n) {
+    if (n.type.isUnaryOperator()) {
+      checkNumber(n.getChild(0))
+    } else if (n.type.isBinaryOperator()) {
+      checkNumber(n.getChild(0))
+      checkNumber(n.getChild(1))
+    } else if (!isOfType(Type.INT, n) && !isOfType(Type.FLOAT, n)) {
+      throw new SemanticException("Expected number", n.l, n.c)
+    }
+  }
+
+  private boolean isOfType(Type type, TokenNode token) {
+    return type.isNode(token.type) || isVarOfType(type, token)
+  }
+
+  private boolean isVarOfType(Type type, TokenNode token) {
+    if (token.type == TokenNodeType.VAR_REF) {
+      Symbol symbol = dequeMap.findSymbol(token.value.name)
+      return symbol.type == type
+    }
+    return false
+  }
 }

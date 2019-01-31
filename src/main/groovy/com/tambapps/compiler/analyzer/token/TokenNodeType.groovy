@@ -9,7 +9,8 @@ enum TokenNodeType {
   COND, BREAK, LOOP,
   PROG, BLOC, SEQ, FUNCTION, FUNCTION_CALL, RETURN,D_REF,
   PRINT,
-  TAB_DECL, TAB_REF;
+  TAB_DECL, TAB_REF,
+  INT, CHAR, STRING, FLOAT;
 
   boolean isUnaryOperator() {
     return this in [PLUS_U, MINUS_U, NOT]
@@ -18,5 +19,9 @@ enum TokenNodeType {
   boolean isBinaryOperator() {
     return this in [PLUS_B, MINUS_B, MODULO, MULTIPLY, DIVIDE, POWER,
                     EQUAL, NOT_EQUAL, STRICT_INF, STRICT_SUP, SUP, INF, AND, OR]
+  }
+
+  boolean isStringOperator() {
+    return isBinaryOperator() && ! (this in [MODULO, DIVIDE, MULTIPLY, POWER])
   }
 }

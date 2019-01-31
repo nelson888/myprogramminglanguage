@@ -1,5 +1,6 @@
 package com.tambapps.compiler.util
 
+import com.tambapps.compiler.analyzer.token.TokenNodeType
 import groovy.transform.PackageScope
 
 class Symbol {
@@ -37,13 +38,46 @@ class Symbol {
   }
 
   enum Type {
-    STRING(""), CHAR(' ' as Character), INT(0), FLOAT(0f), ANY(0),
-    FUNCTION(null); //TODO? function as variable?
+    STRING("", TokenNodeType.STRING), CHAR(' ' as Character, TokenNodeType.CHAR),
+    INT(0, TokenNodeType.INT), FLOAT(0f, TokenNodeType.FLOAT), ANY(0, null),
+    FUNCTION(null, null) //TODO? function as variable?
 
     final def defaultValue
+    private final TokenNodeType nodeType
 
-    Type(def defaultValue) {
+    Type(def defaultValue, TokenNodeType nodeType) {
       this.defaultValue = defaultValue
+      this.nodeType = nodeType
+    }
+
+    boolean isType(def value) {
+      switch (value.getClass()) {
+        case Integer:
+        case Character:
+          return this in [INT, CHAR]
+        case Float:
+          return this == FLOAT
+        case String:
+          return this == STRING
+      }
+      return false
+    }
+
+    boolean isNode(TokenNodeType type) {
+      return !nodeType || nodeType == type
+    }
+
+    static Type toType(def value) {
+      switch (value.getClass()) {
+        case Integer:
+          return INT
+        case String:
+          return STRING
+        case Character:
+          return CHAR
+        case Float:
+          return FLOAT
+      }
     }
   }
 }

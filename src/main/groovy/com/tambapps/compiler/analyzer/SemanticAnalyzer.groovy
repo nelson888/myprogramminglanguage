@@ -6,7 +6,7 @@ import com.tambapps.compiler.exception.SemanticException
 import com.tambapps.compiler.exception.SymbolException
 import com.tambapps.compiler.util.DequeMap
 import com.tambapps.compiler.util.Symbol
-
+//TODO DELETE ME
 class SemanticAnalyzer {
 
   private DequeMap dequeMap = new DequeMap()

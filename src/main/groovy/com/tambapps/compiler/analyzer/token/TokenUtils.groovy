@@ -75,7 +75,7 @@ class TokenUtils {
     operatorMap.put(TokenNodeType.MULTIPLY, {a1, a2 -> return a1 * a2 })
     operatorMap.put(TokenNodeType.MODULO, {a1, a2 -> return a1 % a2 })
     operatorMap.put(TokenNodeType.DIVIDE, {a1, a2 -> return a1 / a2 })
-    operatorMap.put(TokenNodeType.POWER, {a1, a2 -> return power(a1, a2) })
+    operatorMap.put(TokenNodeType.POWER, {a1, a2 -> return a1 ** a2 })
     operatorMap.put(TokenNodeType.MINUS_B, {a1, a2 -> return a1 - a2 })
 
     operatorMap.put(TokenNodeType.EQUAL, {a1, a2 -> return intBool(a1 == a2) })
