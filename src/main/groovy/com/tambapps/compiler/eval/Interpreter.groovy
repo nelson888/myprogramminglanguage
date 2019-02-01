@@ -8,7 +8,6 @@ import com.tambapps.compiler.analyzer.token.TokenNode
 import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
-import com.tambapps.compiler.exception.PointerException
 
 class Interpreter {
 
@@ -33,10 +32,6 @@ class Interpreter {
       println('Error while performing parsing')
       println("$e.message")
       return
-    } catch (EvaluationException e) {
-      println('Error while performing semantic analysis')
-      println("$e.message")
-      return
     }
 
     List<TokenNode> functions = new ArrayList<>()
@@ -56,8 +51,9 @@ class Interpreter {
     Evaluator evaluator = new Evaluator(functions, println)
     try {
       evaluator.process(main)
-    } catch (PointerException e) {
-      println("Pointer exception:\n$e.message")
+    } catch (EvaluationException e) {
+      println("Evaluation exception:\n$e.message")
+      return
     }
     def returnValue = evaluator.returnValue
     if (returnValue != null) {

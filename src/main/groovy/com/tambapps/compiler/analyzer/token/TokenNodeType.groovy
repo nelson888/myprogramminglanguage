@@ -50,15 +50,15 @@ enum TokenNodeType {
     return this in [INT, CHAR, STRING, FLOAT]
   }
 
-  boolean isStringOperator() {
-    return isBinaryOperator() && ! (this in [MODULO, DIVIDE, MULTIPLY, POWER])
-  }
-
   @Override
   String toString() {
-    return name()
-        .replace("_U", " UNARY")
-        .replace("_B", " BINARY")
-
+    String name = name()
+    if (name.contains("_U")) {
+      return "UNARY " + name.replace("_U", "")
+    } else if (name.contains("_U")) {
+      return "BINARY " + name.replace("_B", "")
+    } else {
+      return name
+    }
   }
 }
