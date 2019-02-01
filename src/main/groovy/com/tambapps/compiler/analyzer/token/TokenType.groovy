@@ -18,7 +18,7 @@ enum TokenType {
   INT('-?[0-9]+', Integer.&parseInt),
   FLOAT('-?([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+)', Float.&parseFloat), TRUE('true', { -> true }), FALSE('false', { -> false }),
 
-  TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_VOID('void'),
+  TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'),
   IDENTIFIER('[a-zA-Z0-9]+', { v -> v}),
   END_OF_FILE('EOF'),
 
@@ -78,4 +78,7 @@ enum TokenType {
     return isSymbol() && value.length() == 1 && !Stream.of(ASSIGNMENT, STRICT_SUP, STRICT_INF, NOT).anyMatch(this.&equals)
   }
 
+  boolean isVarType() {
+    return this in [TYPE_FLOAT, TYPE_INT, TYPE_STRING, TYPE_CHAR, VAR]
+  }
 }

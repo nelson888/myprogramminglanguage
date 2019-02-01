@@ -22,7 +22,7 @@ class Symbol {
     this.nbArgs = nbArgs
   }
 
-  private Symbol(String ident, int slot, int nbArgs, int value) {
+  private Symbol(String ident, int slot, int nbArgs, def value) {
     this.ident = ident
     this.slot = slot
     this.nbArgs = nbArgs
@@ -54,6 +54,7 @@ class Symbol {
       if (this == ANY) return true
       switch (value.getClass()) {
         case Integer:
+          if (this == FLOAT) return true
         case Character:
           return this in [INT, CHAR]
         case Float:
@@ -72,7 +73,7 @@ class Symbol {
       return !nodeType || nodeType == type
     }
 
-    static Type toType(def value) {
+    static Type fromValue(def value) {
       switch (value.getClass()) {
         case Integer:
           return INT
@@ -83,6 +84,16 @@ class Symbol {
         case Float:
           return FLOAT
       }
+    }
+  }
+
+  void setValue(def value) {
+    if (type == Type.INT && value instanceof Character) {
+      this.value = (int) value
+    } else if (type == Type.CHAR && value instanceof Integer) {
+      this.value =  (char) value
+    } else {
+      this.value = value
     }
   }
 }

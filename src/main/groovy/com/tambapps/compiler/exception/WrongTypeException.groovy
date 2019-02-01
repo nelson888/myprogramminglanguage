@@ -10,7 +10,7 @@ class WrongTypeException extends EvaluationException {
   }
 
   WrongTypeException(Type expected, def value, TokenNode tk) {
-    super("Expected expression of type $expected but got ${Type.toType(value)}", tk.l, tk.c)
+    super("Expected expression of type $expected but got ${Type.fromValue(value)}", tk.l, tk.c)
   }
 
   WrongTypeException(Type expected, TokenNode tk) {

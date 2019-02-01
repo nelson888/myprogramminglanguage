@@ -10,6 +10,7 @@ import com.tambapps.compiler.exception.ParsingException
 import static com.tambapps.compiler.analyzer.token.TokenUtils.ASSOCIATIVITY_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.BINARY_OPERATOR_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.PRIORITY_MAP
+import static com.tambapps.compiler.analyzer.token.TokenUtils.TYPE_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.VAR_TYPE_MAP
 
 class Parser { //Syntax analyzer
@@ -206,9 +207,14 @@ class Parser { //Syntax analyzer
     Token t = accept(TokenType.IDENTIFIER)
     TokenNode n = new TokenNode(t,TokenNodeType.FUNCTION, [name: t.value])
     accept(TokenType.PARENT_OPEN)
-    while (getCurrent().type != TokenType.PARENT_CLOSE){
+    while (getCurrent().type != TokenType.PARENT_CLOSE) {
+      Token typeTok = getCurrent()
+      moveForward()
+      if (!typeTok.type.varType) {
+        throw new ParsingException("Expected type for argument variable", typeTok.l, typeTok.c)
+      }
       Token acc = accept(TokenType.IDENTIFIER)
-      n.addChild(new TokenNode(acc,TokenNodeType.VAR_DECL))
+      n.addChild(new TokenNode(acc,TokenNodeType.VAR_DECL, [name: acc.value, type: VAR_TYPE_MAP.get(typeTok.type)]))
       if (getCurrent().type == TokenType.COMMA){
         accept(TokenType.COMMA)
       }

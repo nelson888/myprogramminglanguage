@@ -26,6 +26,11 @@ class DequeMap {
 
   }
 
+  void insertSymbol(String ident, Symbol symbol) {
+    def map = symbolsMap.peek()
+    map.put(ident, symbol)
+  }
+
   Symbol newSymbol(String ident) {
     def map = symbolsMap.peek()
     if (map.containsKey(ident)) {

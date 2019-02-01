@@ -1,5 +1,6 @@
 package com.tambapps.compiler.eval
 
+import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.NoSuchOperatorException
 
 import com.tambapps.compiler.exception.WrongTypeException
@@ -26,6 +27,13 @@ class Evaluator {
     this.functions = functions
     this.printer = printer
     dequeMap = new DequeMap()
+  }
+
+  Evaluator(List<TokenNode> functions, Closure printer, List<Symbol> parameters) {
+    this(functions, printer)
+    for (Symbol symbol : parameters) {
+      dequeMap.newSymbol(symbol)
+    }
   }
 
   Evaluator(List<TokenNode> functions) {
@@ -135,7 +143,7 @@ class Evaluator {
   private def evaluate(TokenNode e) { //evaluates an expression
     if (e.type.unaryOperator) {
       def arg = evaluate(e.getChild(0))
-      Type type = Type.toType(arg)
+      Type type = Type.fromValue(arg)
       if (!e.type.canOperate(type)) {
         throw new NoSuchOperatorException(e.type, type, e)
       }
@@ -143,7 +151,7 @@ class Evaluator {
     } else if (e.type.binaryOperator) {
       def arg1 = evaluate(e.getChild(0))
       def arg2 = evaluate(e.getChild(1))
-      List<Type> types = [arg1, arg2].collect { v -> Type.toType(v)}
+      List<Type> types = [arg1, arg2].collect { v -> Type.fromValue(v)}
       if (!e.type.canOperate(*types)) {
         throw new NoSuchOperatorException(e.type, *types, e)
       }
@@ -172,16 +180,29 @@ class Evaluator {
         Symbol s = dequeMap.findSymbol(e.value)
         return s.value++;*/
       case TokenNodeType.FUNCTION_CALL:
-        Symbol funcData = dequeMap.findSymbol(e.value)
-        TokenNode function = functions.find({ f -> funcData == f.value })
-        Evaluator evaluator = new Evaluator(functions, printer)
-        List<Symbol> arguments = new ArrayList<>()
-        for (int i = 0; i < funcData.nbArgs; i++) {
-          Symbol argument = dequeMap.findSymbol(function.getChild(i).value).copy()
-          argument.value = evaluate(e.getChild(i))
-          arguments.add(argument)
+        TokenNode function = functions.find({ f -> e.value.name == f.value.name })
+        int nbArgs = function.nbChildren() - 1
+        int nbChildren = e.nbChildren()
+        if (nbChildren != nbArgs) {
+          throw new EvaluationException('There is ' +
+              (nbChildren < nbArgs ? 'not enough' : 'too much') +
+              " arguments to call function $function.value.name (expected $nbArgs, found $nbChildren)",
+              e.l, e.c)
         }
-        evaluator.initVariables(arguments)
+        Evaluator evaluator = new Evaluator(functions, printer)
+        for (int i = 0; i < nbArgs; i++) {
+          def argData = function.getChild(i).value
+          Symbol argument = dequeMap.findSymbol(function.getChild(i).value).copy()
+          def argValueNode = e.getChild(i)
+          def argValue = evaluate(argValueNode)
+          argument.type = argData.type
+          if (!argData.type.isType(argValue)) {
+            throw new WrongTypeException(argData.type, argValue, argValueNode)
+          }
+          argument.value = argValue
+          evaluator.dequeMap.insertSymbol(argData.name, argument)
+        }
+        evaluator.dequeMap
         evaluator.process(function.getChild(function.nbChildren() - 1)) //skip variable declarations
         return evaluator.getReturnValue()
 
@@ -190,13 +211,7 @@ class Evaluator {
     }
   }
 
-  private void initVariables(List<Symbol> symbols) { //for function call
-    for (Symbol symbol : symbols) {
-      dequeMap.newSymbol(symbol)
-    }
-  }
-
-  Integer getReturnValue() {
+  def getReturnValue() {
     return returnValue
   }
 }
