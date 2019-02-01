@@ -74,6 +74,27 @@ class Evaluator {
         } else if (left.type == TokenNodeType.TAB_REF) {
           int index = evaluate(left.getChild(0)) + 1 //because 0 is the tab variable itself
           s = dequeMap.findSymbol(left.value)
+          if (s.type == Type.STRING) {
+            String str = s.value
+            index--
+            if (index >= str.size()) {
+              throw new PointerException("Tried to access character $index of string \"$str\"", node)
+            }
+            Type t = Type.fromValue(value)
+            if (t != Type.CHAR) {
+              throw new WrongTypeException(Type.STRING, t, node)
+            }
+            StringBuilder builder = new StringBuilder()
+            for (int i = 0; i < str.size(); i++) {
+              if (i == index) {
+                builder.append(value)
+              } else {
+                builder.append(str.charAt(i))
+              }
+            }
+            s.value = builder.toString()
+            break
+          }
           if (s.slot + index > nbSlot) {
             throw new PointerException("Tried to access element $index of array $left.value", node)
           }
@@ -160,6 +181,13 @@ class Evaluator {
       case TokenNodeType.TAB_REF:
         int index = evaluate(e.getChild(0)) + 1 //because 0 is the tab variable itself
         Symbol s = dequeMap.findSymbol(e.value)
+        if (s.type == Type.STRING) {
+          String str = s.value
+          if (index >= str.size()) {
+            throw new PointerException("Tried to access character $index of string \"$str\"", e)
+          }
+          return str.charAt(index - 1)
+        }
         if (s.slot + index > nbSlot) {
           throw new PointerException("Tried to access element $index of array $e.value", e)
         }
