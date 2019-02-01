@@ -29,13 +29,6 @@ class Evaluator {
     dequeMap = new DequeMap()
   }
 
-  Evaluator(List<TokenNode> functions, Closure printer, List<Symbol> parameters) {
-    this(functions, printer)
-    for (Symbol symbol : parameters) {
-      dequeMap.newSymbol(symbol)
-    }
-  }
-
   Evaluator(List<TokenNode> functions) {
     this(functions, System.out.&println)
   }
@@ -115,7 +108,7 @@ class Evaluator {
         }
         break
       case TokenNodeType.FUNCTION_CALL: //like a procedure call
-        evaluate(node)
+        functionCall(node)
         break
       case TokenNodeType.PRINT:
         printer(evaluate(node.getChild(0)))
@@ -180,35 +173,44 @@ class Evaluator {
         Symbol s = dequeMap.findSymbol(e.value)
         return s.value++;*/
       case TokenNodeType.FUNCTION_CALL:
-        TokenNode function = functions.find({ f -> e.value.name == f.value.name })
-        int nbArgs = function.nbChildren() - 1
-        int nbChildren = e.nbChildren()
-        if (nbChildren != nbArgs) {
-          throw new EvaluationException('There is ' +
-              (nbChildren < nbArgs ? 'not enough' : 'too much') +
-              " arguments to call function $function.value.name (expected $nbArgs, found $nbChildren)",
+        def value = functionCall(e)
+        if (value == null) {
+          throw new WrongTypeException("Expected a value to be returned from function $e.value.name",
               e.l, e.c)
         }
-        Evaluator evaluator = new Evaluator(functions, printer)
-        for (int i = 0; i < nbArgs; i++) {
-          def argData = function.getChild(i).value
-          Symbol argument = dequeMap.findSymbol(function.getChild(i).value).copy()
-          def argValueNode = e.getChild(i)
-          def argValue = evaluate(argValueNode)
-          argument.type = argData.type
-          if (!argData.type.isType(argValue)) {
-            throw new WrongTypeException(argData.type, argValue, argValueNode)
-          }
-          argument.value = argValue
-          evaluator.dequeMap.insertSymbol(argData.name, argument)
-        }
-        evaluator.dequeMap
-        evaluator.process(function.getChild(function.nbChildren() - 1)) //skip variable declarations
-        return evaluator.getReturnValue()
+        return value
 
       default:
         throw new RuntimeException("This shouldn't happen")
     }
+  }
+
+  def functionCall(TokenNode e) {
+    TokenNode function = functions.find({ f -> e.value.name == f.value.name })
+    int nbArgs = function.nbChildren() - 1
+    int nbChildren = e.nbChildren()
+    if (nbChildren != nbArgs) {
+      throw new EvaluationException('There is ' +
+          (nbChildren < nbArgs ? 'not enough' : 'too much') +
+          " arguments to call function $function.value.name (expected $nbArgs, found $nbChildren)",
+          e.l, e.c)
+    }
+    Evaluator evaluator = new Evaluator(functions, printer)
+    for (int i = 0; i < nbArgs; i++) {
+      def argData = function.getChild(i).value
+      Symbol argument = dequeMap.findSymbol(function.getChild(i).value).copy()
+      def argValueNode = e.getChild(i)
+      def argValue = evaluate(argValueNode)
+      argument.type = argData.type
+      if (!argData.type.isType(argValue)) {
+        throw new WrongTypeException(argData.type, argValue, argValueNode)
+      }
+      argument.value = argValue
+      evaluator.dequeMap.insertSymbol(argData.name, argument)
+    }
+    evaluator.dequeMap
+    evaluator.process(function.getChild(function.nbChildren() - 1)) //skip variable declarations
+    return evaluator.getReturnValue()
   }
 
   def getReturnValue() {
