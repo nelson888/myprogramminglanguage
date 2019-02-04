@@ -49,7 +49,7 @@ var z = x + 5* y;
 for and while loops are handled, like in the following example
 ```javascript
 var i;
-for (i = 0; i < 10; i = i + 1) {
+for (i = 0; i < 10; i++) {
     print(i);
 }
 ```
@@ -66,7 +66,7 @@ You can print the value of variable with the `print` function
 ## Other features
 
 ### String as char[]
-string can be considered as array, and are therefore not immutable
+string can be considered as char array, and are therefore mutable
 
 ```javascript
 string s = "hello";
@@ -74,6 +74,7 @@ s[0] = 'y';
 char c = s[2];
 print(s);
 ```
+
 ### Ternary
 TODO
 
