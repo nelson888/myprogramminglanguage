@@ -55,6 +55,12 @@ class Parser { //Syntax analyzer
           TokenNode N = new TokenNode(t, TokenNodeType.TAB_REF).withChildren(expression())
           accept(TokenType.BRACKET_CLOSE)
           return N
+        } else if (getCurrent().type in [TokenType.INCREMENT, TokenType.DECREMENT]) {
+          TokenNodeType type = getCurrent().type == TokenType.INCREMENT ?
+              TokenNodeType.INCREMENT_AFTER : TokenNodeType.DECREMENT_AFTER
+              moveForward()
+          TokenNode identNode = new TokenNode(t, TokenNodeType.VAR_REF, [name: t.value])
+          return new TokenNode(t, type, null).withChildren(identNode)
         }
         return new TokenNode(t, TokenNodeType.VAR_REF, [name: t.value])
       case TokenType.PLUS:
@@ -70,6 +76,14 @@ class Parser { //Syntax analyzer
         }
         moveForward()
         return node
+      case TokenType.INCREMENT:
+      case TokenType.DECREMENT:
+        TokenNodeType type = t.type == TokenType.INCREMENT ?
+            TokenNodeType.INCREMENT_BEFORE : TokenNodeType.DECREMENT_BEFORE
+        Token identTok = accept(TokenType.IDENTIFIER)
+        TokenNode identNode = new TokenNode(identTok, TokenNodeType.VAR_REF, [name: identTok.value])
+        return new TokenNode(t, type, null).withChildren(identNode)
+
     }
     throw new ParsingException("Unexpected token $t.type encountered", t.l, t.c)
   }
@@ -197,7 +211,7 @@ class Parser { //Syntax analyzer
 
   private TokenNode programme(){
     TokenNode p = new TokenNode(TokenNodeType.PROG, 0,0)
-    while (getCurrent().type != TokenType.END_OF_FILE){
+    while (getCurrent().type != TokenType.END_OF_FILE) {
       p.addChild(fonction())
     }
     return p
@@ -244,7 +258,7 @@ class Parser { //Syntax analyzer
   Token accept(TokenType t) {
     Token token = getCurrent()
     if (token.type != t) {
-      throw new ParsingException("Expected token of type $t", token.l, token.c)
+      throw new ParsingException("Expected token of type $t but got $token.type", token.l, token.c)
     }
     moveForward()
     return token

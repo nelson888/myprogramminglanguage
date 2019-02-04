@@ -4,13 +4,14 @@ import java.util.stream.Stream
 
 enum TokenType {
   NOT('!'),// unary operator
+  INCREMENT('\\+\\+'), DECREMENT('\\-\\-'),
   PLUS('\\+'), MINUS('-'), // unary or binary operator
   DIVIDE('/'), MULTIPLY('\\*'), POWER('\\*\\*'), MODULO('%'), // binary operator
   ASSIGNMENT('='),
   EQUAL('=='), NOT_EQUAL('!='), STRICT_SUP('>'), STRICT_INF('<'), SUP('>='), INF('<='), AND('and'), OR('or'), //binary operator
   PARENT_OPEN('\\('), PARENT_CLOSE('\\)'), COMMA(','), SEMICOLON(';'), ACCOLADE_OPEN('\\{'), ACCOLADE_CLOSE('\\}'), BRACKET_OPEN('\\['), BRACKET_CLOSE('\\]'),
 
-  IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'),
+  IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'), BREAk('break'), CONTINUE('continue'), //TODO break, continue
   VAR('var'),
 
   STRING('\"(.*?)\"', {String v -> v.substring(1, v.length() - 1) }),

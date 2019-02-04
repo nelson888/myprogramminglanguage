@@ -33,12 +33,13 @@ class Evaluator {
     this(functions, System.out.&println)
   }
 
-  void process(TokenNode node) throws PointerException {
+  void process(TokenNode node) throws EvaluationException {
     switch (node.type) {
       case TokenNodeType.VAR_DECL:
         Symbol s = dequeMap.newSymbol(node.value.name)
         s.slot = nbSlot++
         s.type = node.value.type
+        s.value = s.type.defaultValue
         break
       case TokenNodeType.TAB_DECL: //child => size
         String tabName = node.value.name
@@ -194,12 +195,27 @@ class Evaluator {
         Symbol pointedSymbol = dequeMap.findSymbolWithSlot(s.slot + index)
         return pointedSymbol.value
 
-      /*
-      case TokenNodeType.INCREMENT:
-      case TokenNodeType.DECREMENT:
-        int arg1 = evaluate(e.getChild(0));
-        Symbol s = dequeMap.findSymbol(e.value)
-        return s.value++;*/
+
+      case TokenNodeType.INCREMENT_BEFORE:
+      case TokenNodeType.DECREMENT_BEFORE:
+      case TokenNodeType.INCREMENT_AFTER:
+      case TokenNodeType.DECREMENT_AFTER:
+        def varNode = e.getChild(0)
+        def arg1 = evaluate(varNode)
+        Symbol s = dequeMap.findSymbol(varNode.value)
+        Type argType = Type.fromValue(arg1)
+        if (!e.type.canOperate(argType)) {
+          throw new NoSuchOperatorException(e.type, argType, e)
+        }
+        def newVal =  OPERATOR_MAP.get(e.type).call(s.value)
+        if (e.type in [TokenNodeType.INCREMENT_BEFORE, TokenNodeType.DECREMENT_BEFORE]) {
+          s.value = newVal
+          return newVal
+        } else {
+          def oldVal = s.value
+          s.value = newVal
+          return oldVal
+        }
       case TokenNodeType.FUNCTION_CALL:
         def value = functionCall(e)
         if (value == null) {
@@ -207,6 +223,7 @@ class Evaluator {
               e.l, e.c)
         }
         return value
+
 
       default:
         throw new RuntimeException("This shouldn't happen")

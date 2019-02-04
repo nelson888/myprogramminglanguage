@@ -94,6 +94,11 @@ class TokenUtils {
     operatorMap.put(TokenNodeType.PLUS_U, {a -> return a })
     operatorMap.put(TokenNodeType.NOT, {a -> return intBool(!a) })
 
+    operatorMap.put(TokenNodeType.INCREMENT_AFTER, {a -> return a + 1 }) //increment regarless of order (after/before). Order is
+    operatorMap.put(TokenNodeType.INCREMENT_BEFORE, operatorMap.get(TokenNodeType.INCREMENT_AFTER)) //handled in Evaluator
+    operatorMap.put(TokenNodeType.DECREMENT_AFTER, {a -> return a - 1 })
+    operatorMap.put(TokenNodeType.DECREMENT_BEFORE, operatorMap.get(TokenNodeType.DECREMENT_AFTER))
+
     //filled in the loop
     Map<TokenType, Integer> associativityMap = new HashMap<>()
     Map<String, TokenType> keywordsMap = new HashMap<>()

@@ -4,6 +4,7 @@ import com.tambapps.compiler.util.Symbol.Type
 
 enum TokenNodeType {
   PLUS_U, MINUS_U, NOT,
+  INCREMENT_BEFORE, DECREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_AFTER,
   PLUS_B, MINUS_B, MODULO, MULTIPLY, DIVIDE, POWER,
   EQUAL, NOT_EQUAL, STRICT_INF, STRICT_SUP, SUP, INF, AND, OR,
   DROP, ASSIGNMENT, VAR_REF, VAR_DECL,
@@ -42,11 +43,16 @@ enum TokenNodeType {
         return arg1 != Type.STRING
       case MINUS_B:
         return ! (arg1 in [Type.STRING, Type.CHAR])
+      case INCREMENT_BEFORE:
+      case DECREMENT_BEFORE:
+      case INCREMENT_AFTER:
+      case DECREMENT_AFTER:
+        return arg1 != Type.STRING
     }
     return false
   }
 
-  boolean isValue() {
+    boolean isValue() {
     return this in [INT, CHAR, STRING, FLOAT]
   }
 

@@ -47,7 +47,7 @@ class DequeMap {
         return map.get(ident)
       }
     }
-    throw new SymbolException("Symbol not $ident found")
+    throw new SymbolException("Symbol $ident not found")
   }
 
   Symbol findSymbol(def varRef) {
