@@ -3,31 +3,37 @@ package com.tambapps.compiler.analyzer.token
 import java.util.stream.Stream
 
 enum TokenType {
-  NOT('!'),// unary operator
-  INCREMENT('\\+\\+'), DECREMENT('\\-\\-'),
-  PLUS('\\+'), MINUS('-'), // unary or binary operator
-  DIVIDE('/'), MULTIPLY('\\*'), POWER('\\*\\*'), MODULO('%'), // binary operator
-  ASSIGNMENT('='),
-  EQUAL('=='), NOT_EQUAL('!='), STRICT_SUP('>'), STRICT_INF('<'), SUP('>='), INF('<='), AND('and'), OR('or'), //binary operator
-  PARENT_OPEN('\\('), PARENT_CLOSE('\\)'), COMMA(','), SEMICOLON(';'), ACCOLADE_OPEN('\\{'), ACCOLADE_CLOSE('\\}'), BRACKET_OPEN('\\['), BRACKET_CLOSE('\\]'),
-
-  IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'), BREAk('break'), CONTINUE('continue'), //TODO break, continue
-  VAR('var'),
-
-  STRING('\"(.*?)\"', {String v -> v.substring(1, v.length() - 1) }),
-  CHAR("'(.*?)'", {String v -> v.charAt(1)}),
-  INT('-?[0-9]+', Integer.&parseInt),
-  FLOAT('-?([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+)', Float.&parseFloat), TRUE('true', { -> true }), FALSE('false', { -> false }),
-
-  TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'),
-  IDENTIFIER('[a-zA-Z0-9]+', { v -> v}),
-  END_OF_FILE('EOF'),
-
   //removable tokens
   WHITESPACE('[ ]+'),
   LINE_BREAK('\\R'),
   COMMENT_LINE('//(.*)\n'),
-  COMMENT_BLOCK('/\\*.*\n.*\\*\\/');
+  COMMENT_BLOCK('/\\*.*\n.*\\*\\/'),
+
+  //operators
+  NOT('!'),// unary operator
+  INCREMENT('\\+\\+'), DECREMENT('\\-\\-'),
+  PLUS('\\+'), MINUS('-'), // unary or binary operator
+  DIVIDE('/'), MULTIPLY('\\*'), POWER('\\*\\*'), MODULO('%'), // binary operator
+  EQUAL('=='), NOT_EQUAL('!='), STRICT_SUP('>'), STRICT_INF('<'), SUP('>='), INF('<='), AND('and'), OR('or'), //binary operator
+  ASSIGNMENT('='),
+
+  //other symbols
+  PARENT_OPEN('\\('), PARENT_CLOSE('\\)'), COMMA(','), SEMICOLON(';'), ACCOLADE_OPEN('\\{'),
+  ACCOLADE_CLOSE('\\}'), BRACKET_OPEN('\\['), BRACKET_CLOSE('\\]'),
+
+  //key words
+  IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'), BREAK('break'), CONTINUE('continue'),
+  VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'),
+
+  //values
+  STRING('\"(.*?)\"', {String v -> v.substring(1, v.length() - 1) }),
+  CHAR("'(.*?)'", {String v -> v.charAt(1)}),
+  INT('-?[0-9]+', Integer.&parseInt),
+  FLOAT('-?([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+)', Float.&parseFloat),
+  TRUE('true', { -> true }), FALSE('false', { -> false }),
+
+  IDENTIFIER('[a-zA-Z0-9]+', { v -> v}),
+  END_OF_FILE('EOF');
 
   final String value
   private final Closure matchingMapper

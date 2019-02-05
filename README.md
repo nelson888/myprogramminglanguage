@@ -47,9 +47,8 @@ var z = x + 5* y;
 ```
 ### for and while loops
 for and while loops are handled, like in the following example
-```javascript
-var i;
-for (i = 0; i < 10; i++) {
+```java
+for (int i = 0; i < 10; i++) {
     print(i);
 }
 ```
@@ -68,12 +67,15 @@ You can print the value of variable with the `print` function
 ### String as char[]
 string can be considered as char array, and are therefore mutable
 
-```javascript
+```java
 string s = "hello";
 s[0] = 'y';
 char c = s[2];
 print(s);
 ```
+
+### Break, Continue
+DONE
 
 ### Ternary
 TODO
@@ -96,7 +98,3 @@ main() {
 ```
 
 The main() function will be executed
-
-There are some already built-in functions so you can't write a functions named:
-- power
-- malloc

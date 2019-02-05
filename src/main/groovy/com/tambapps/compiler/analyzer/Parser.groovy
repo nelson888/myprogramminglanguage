@@ -173,8 +173,7 @@ class Parser { //Syntax analyzer
         TokenNode N = new TokenNode(accept(TokenType.FOR)) //noeud seq
         TokenNode loop = new TokenNode(TokenNodeType.LOOP, N.l, N.c)
         accept(TokenType.PARENT_OPEN)
-        TokenNode init = expression()
-        accept(TokenType.SEMICOLON)
+        TokenNode init = statement()
         TokenNode test = expression()
         accept(TokenType.SEMICOLON)
         TokenNode step = expression()
@@ -189,7 +188,7 @@ class Parser { //Syntax analyzer
         loop.addChild(cond)
         cond.addChildren(test, seq, breakNode)
         seq.addChildren(body, step)
-        return N
+        return new TokenNode(t, TokenNodeType.BLOC).withChildren(N)
       case TokenType.PRINT:
         TokenNode print = new TokenNode(accept(TokenType.PRINT))
         TokenNode e = expression()
@@ -202,7 +201,11 @@ class Parser { //Syntax analyzer
         n.addChild(expression())
         accept(TokenType.SEMICOLON)
         return n
-
+      case TokenType.BREAK:
+      case TokenType.CONTINUE:
+        moveForward()
+        accept(TokenType.SEMICOLON)
+        return new TokenNode(t)
       default: // expression;
         TokenNode e = expression()
         return new TokenNode(TokenNodeType.DROP, accept(TokenType.SEMICOLON), [e])

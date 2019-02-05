@@ -50,6 +50,8 @@ class TokenUtils {
     typeMap.put(TokenType.FOR, TokenNodeType.SEQ)
     typeMap.put(TokenType.PRINT, TokenNodeType.PRINT)
     typeMap.put(TokenType.RETURN, TokenNodeType.RETURN)
+    typeMap.put(TokenType.BREAK, TokenNodeType.BREAK)
+    typeMap.put(TokenType.CONTINUE, TokenNodeType.CONTINUE)
     typeMap.put(TokenType.INT, TokenNodeType.INT)
     typeMap.put(TokenType.FLOAT, TokenNodeType.FLOAT)
     typeMap.put(TokenType.CHAR, TokenNodeType.CHAR)

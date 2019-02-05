@@ -1,6 +1,7 @@
 package com.tambapps.compiler.eval
 
 import com.tambapps.compiler.exception.EvaluationException
+import com.tambapps.compiler.exception.IllegalStatementException
 import com.tambapps.compiler.exception.NoSuchOperatorException
 
 import com.tambapps.compiler.exception.WrongTypeException
@@ -17,6 +18,8 @@ import com.tambapps.compiler.util.Symbol.Type
 class Evaluator {
 
   private final List<TokenNode> functions
+  private final Queue<TokenNodeType> loopInterruptQueue = new ArrayDeque<>()
+  private int loops = 0 //number of nested loops
   private final Closure printer
   private DequeMap dequeMap
   private def returnValue = null
@@ -59,6 +62,13 @@ class Evaluator {
         dequeMap.newBlock()
         for (int i = 0; i < node.nbChildren(); i++) {
           process(node.getChild(i))
+          if (!loopInterruptQueue.isEmpty()) {
+            def type = loopInterruptQueue.first()
+            if (loops == 0) {
+              throw new IllegalStatementException("Can't use $type outside of a loop", node)
+            }
+            break
+          }
         }
         dequeMap.endBlock()
         break
@@ -119,9 +129,18 @@ class Evaluator {
       case TokenNodeType.LOOP:
         TokenNode condNode = node.getChild(0)
         TokenNode testNode = condNode.getChild(0)
-        while (evaluate(testNode)) {
+        loops++
+        boolean brokeLoop = false
+        while (!brokeLoop && evaluate(testNode)) {
           process(condNode.getChild(1))
+          if (!loopInterruptQueue.empty) {
+            def type = loopInterruptQueue.remove()
+            if (type == TokenNodeType.BREAK) { //continue is already handled
+              brokeLoop = true
+            }
+          }
         }
+        loops--
         break
       case TokenNodeType.RETURN:
         if (node.nbChildren() > 0) {
@@ -135,15 +154,26 @@ class Evaluator {
       case TokenNodeType.PRINT:
         printer(evaluate(node.getChild(0)))
         break
+      case TokenNodeType.FUNCTION:
       case TokenNodeType.SEQ:
         for (int i = 0; i < node.nbChildren(); i++) {
           process(node.getChild(i))
         }
         break
+      case TokenNodeType.CONTINUE:
+      case TokenNodeType.BREAK:
+        loopInterruptQueue.add(node.type)
+        break
+      case TokenNodeType.INCREMENT_BEFORE:
+      case TokenNodeType.DECREMENT_BEFORE:
+      case TokenNodeType.INCREMENT_AFTER:
+      case TokenNodeType.DECREMENT_AFTER:
+        evaluate(node)
+        break
+      case TokenNodeType.DROP:
+        break
       default:
-        for (int i = 0; i < node.nbChildren(); i++) {
-          process(node.getChild(i))
-        }
+        throw new RuntimeException("Unhandled node type $node.type")
     }
   }
 

@@ -8,7 +8,7 @@ enum TokenNodeType {
   PLUS_B, MINUS_B, MODULO, MULTIPLY, DIVIDE, POWER,
   EQUAL, NOT_EQUAL, STRICT_INF, STRICT_SUP, SUP, INF, AND, OR,
   DROP, ASSIGNMENT, VAR_REF, VAR_DECL,
-  COND, BREAK, LOOP,
+  COND, BREAK, CONTINUE, LOOP,
   PROG, BLOC, SEQ, FUNCTION, FUNCTION_CALL, RETURN,D_REF,
   PRINT,
   TAB_DECL, TAB_REF,
@@ -34,7 +34,7 @@ enum TokenNodeType {
       case MULTIPLY:
         return arg1.number && arg2.number || arg1 == Type.STRING && arg2.number
     }
-    return false
+    return true
   }
 
   boolean canOperate(Type arg1) {
