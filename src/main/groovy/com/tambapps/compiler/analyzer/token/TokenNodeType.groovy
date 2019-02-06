@@ -37,19 +37,8 @@ enum TokenNodeType {
     return true
   }
 
-  boolean canOperate(Type arg1) {
-    switch (this) {
-      case PLUS_B:
-        return arg1 != Type.STRING
-      case MINUS_B:
-        return ! (arg1 in [Type.STRING, Type.CHAR])
-      case INCREMENT_BEFORE:
-      case DECREMENT_BEFORE:
-      case INCREMENT_AFTER:
-      case DECREMENT_AFTER:
-        return arg1 != Type.STRING
-    }
-    return false
+  boolean canOperate(Type arg) {
+    return arg != Type.STRING
   }
 
     boolean isValue() {
