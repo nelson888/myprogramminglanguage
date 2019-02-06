@@ -10,7 +10,6 @@ import com.tambapps.compiler.exception.ParsingException
 import static com.tambapps.compiler.analyzer.token.TokenUtils.ASSOCIATIVITY_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.BINARY_OPERATOR_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.PRIORITY_MAP
-import static com.tambapps.compiler.analyzer.token.TokenUtils.TYPE_MAP
 import static com.tambapps.compiler.analyzer.token.TokenUtils.VAR_TYPE_MAP
 
 class Parser { //Syntax analyzer
@@ -36,6 +35,8 @@ class Parser { //Syntax analyzer
       case TokenType.CHAR:
       case TokenType.FLOAT:
       case TokenType.INT:
+      case TokenType.TRUE:
+      case TokenType.FALSE:
         return new TokenNode(t)
       case TokenType.IDENTIFIER:
         if (getCurrent().type == TokenType.PARENT_OPEN) {
@@ -89,7 +90,16 @@ class Parser { //Syntax analyzer
   }
 
   private TokenNode expression() {
-    return expression(Integer.MAX_VALUE)
+    TokenNode expr = expression(Integer.MAX_VALUE)
+    if (getCurrent().type == TokenType.QUESTION_MARK) {
+      //terNode children: 1)evaluation 2)true value 3)false value
+      TokenNode terNode = new TokenNode(accept(TokenType.QUESTION_MARK))
+      terNode.addChildren(expr, expression())
+      accept(TokenType.TERNARY_SEPARATOR)
+      terNode.addChild(expression())
+      return terNode
+    }
+    return expr
   }
 
   private TokenNode expression(int maxP) {
@@ -112,6 +122,7 @@ class Parser { //Syntax analyzer
       case TokenType.TYPE_STRING:
       case TokenType.TYPE_CHAR:
       case TokenType.TYPE_INT:
+      case TokenType.TYPE_BOOL:
       case TokenType.FLOAT:
       case TokenType.VAR:
         moveForward()

@@ -151,6 +151,9 @@ class Evaluator {
       case TokenNodeType.FUNCTION_CALL: //like a procedure call
         functionCall(node)
         break
+      case TokenNodeType.TERNARY:
+        evaluate(node)
+        break
       case TokenNodeType.PRINT:
         printer(evaluate(node.getChild(0)))
         break
@@ -224,8 +227,6 @@ class Evaluator {
         }
         Symbol pointedSymbol = dequeMap.findSymbolWithSlot(s.slot + index)
         return pointedSymbol.value
-
-
       case TokenNodeType.INCREMENT_BEFORE:
       case TokenNodeType.DECREMENT_BEFORE:
       case TokenNodeType.INCREMENT_AFTER:
@@ -253,8 +254,9 @@ class Evaluator {
               e.l, e.c)
         }
         return value
-
-
+      case TokenNodeType.TERNARY:
+        def test = evaluate(e.getChild(0))
+        return evaluate(test ? e.getChild(1) : e.getChild(2))
       default:
         throw new RuntimeException("This shouldn't happen")
     }

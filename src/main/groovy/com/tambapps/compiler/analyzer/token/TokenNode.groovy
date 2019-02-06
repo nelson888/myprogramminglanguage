@@ -12,7 +12,7 @@ class TokenNode extends AbstractToken {
   TokenNode(AbstractToken token, TokenNodeType type, def value) {
     super(token.l, token.c, value)
     if (type == null) {
-      throw new IllegalArgumentException("$type cannot bu null")
+      throw new IllegalArgumentException("type cannot be null")
     }
     this.type = type
   }

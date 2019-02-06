@@ -57,6 +57,8 @@ class Symbol {
           if (this == FLOAT) return true
         case Character:
           return this in [INT, CHAR]
+        case Boolean:
+          return this == INT
         case Float:
           return this == FLOAT
         case String:
@@ -76,6 +78,7 @@ class Symbol {
     static Type fromValue(def value) {
       switch (value.getClass()) {
         case Integer:
+        case Boolean:
           return INT
         case String:
           return STRING

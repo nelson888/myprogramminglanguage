@@ -11,6 +11,7 @@ enum TokenType {
 
   //operators
   NOT('!'),// unary operator
+  QUESTION_MARK('\\?'), TERNARY_SEPARATOR(':'), //ternary
   INCREMENT('\\+\\+'), DECREMENT('\\-\\-'),
   PLUS('\\+'), MINUS('-'), // unary or binary operator
   DIVIDE('/'), MULTIPLY('\\*'), POWER('\\*\\*'), MODULO('%'), // binary operator
@@ -23,14 +24,14 @@ enum TokenType {
 
   //key words
   IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'), BREAK('break'), CONTINUE('continue'),
-  VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'),
+  VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_BOOL('bool'),
 
   //values
   STRING('\"(.*?)\"', {String v -> v.substring(1, v.length() - 1) }),
   CHAR("'(.*?)'", {String v -> v.charAt(1)}),
   INT('-?[0-9]+', Integer.&parseInt),
   FLOAT('-?([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+)', Float.&parseFloat),
-  TRUE('true', { -> true }), FALSE('false', { -> false }),
+  TRUE('true', { v -> true }), FALSE('false', { v -> false }),
 
   IDENTIFIER('[a-zA-Z0-9]+', { v -> v}),
   END_OF_FILE('EOF');

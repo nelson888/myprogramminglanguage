@@ -62,6 +62,9 @@ while (i < 10) {
 ```
 You can print the value of variable with the `print` function
 
+## Types
+bblablabla
+bool is considered as an int
 ## Other features
 
 ### String as char[]
