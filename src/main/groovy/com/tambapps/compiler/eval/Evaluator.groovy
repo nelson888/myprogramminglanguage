@@ -5,6 +5,7 @@ import com.tambapps.compiler.exception.IllegalStatementException
 import com.tambapps.compiler.exception.NoSuchOperatorException
 
 import com.tambapps.compiler.exception.WrongTypeException
+import com.tambapps.compiler.util.Array
 
 import static com.tambapps.compiler.analyzer.token.TokenUtils.OPERATOR_MAP
 
@@ -49,14 +50,10 @@ class Evaluator {
         def defaultValue = node.value.type.defaultValue
         Symbol s = dequeMap.newSymbol(tabName)
         s.slot = nbSlot++
-        s.type = node.value.type
+        s.type = Type.arrayType(node.value.type)
         int size = evaluate(node.getChild(0), Type.INT)
-        for (int i = 0; i < size; i++) {
-          s = dequeMap.newSymbol(i + tabName)
-          s.slot = nbSlot++
-          s.value = defaultValue
-          s.type = node.value.type
-        }
+        s.value = new Object[size]
+        Arrays.fill(s.value, defaultValue)
         break
       case TokenNodeType.BLOC:
         dequeMap.newBlock()
@@ -76,40 +73,27 @@ class Evaluator {
         TokenNode left = node.getChild(0)
         Symbol s
         def value = evaluate(node.getChild(1))
+        if (left.type == TokenNodeType.TAB_REF) {
+          int index = evaluate(left.getChild(0))
+          s = dequeMap.findSymbol(left.value)
+          def array = s.value
+          if (array.size() <= index) {
+            throw new PointerException("Tried to access element $index of array $left.value " +
+                "with size ${array.size()}", node)
+          }
+          Type elementType = s.type.elementType()
+          if (!elementType.isType(value)) {
+            throw new WrongTypeException(elementType, value, node)
+          }
+          array[index] = value
+          break
+        }
         if (left.type == TokenNodeType.D_REF) {
           s = dequeMap.findSymbol(left.getChild(0).value)
           if (s.slot > nbSlot) {
             throw new PointerException("Pointed variable with address $s.value doesn't exist", node)
           }
           s = dequeMap.findSymbolWithSlot(s.value)
-        } else if (left.type == TokenNodeType.TAB_REF) {
-          int index = evaluate(left.getChild(0)) + 1 //because 0 is the tab variable itself
-          s = dequeMap.findSymbol(left.value)
-          if (s.type == Type.STRING) {
-            String str = s.value
-            index--
-            if (index >= str.size()) {
-              throw new PointerException("Tried to access character $index of string \"$str\"", node)
-            }
-            Type t = Type.fromValue(value)
-            if (t != Type.CHAR) {
-              throw new WrongTypeException(Type.STRING, t, node)
-            }
-            StringBuilder builder = new StringBuilder()
-            for (int i = 0; i < str.size(); i++) {
-              if (i == index) {
-                builder.append(value)
-              } else {
-                builder.append(str.charAt(i))
-              }
-            }
-            s.value = builder.toString()
-            break
-          }
-          if (s.slot + index > nbSlot) {
-            throw new PointerException("Tried to access element $index of array $left.value", node)
-          }
-          s = dequeMap.findSymbolWithSlot(s.slot + index)
         } else {
           s = dequeMap.findSymbol(left.value)
         }
@@ -155,10 +139,15 @@ class Evaluator {
         evaluate(node)
         break
       case TokenNodeType.PRINT:
-        printer(evaluate(node.getChild(0)))
+        def value = evaluate(node.getChild(0))
+        if (value instanceof Array) {
+          value = value.array
+        }
+        printer(value)
         break
       case TokenNodeType.FUNCTION:
       case TokenNodeType.SEQ:
+      case TokenNodeType.DROP: //should have only 1 child
         for (int i = 0; i < node.nbChildren(); i++) {
           process(node.getChild(i))
         }
@@ -172,8 +161,6 @@ class Evaluator {
       case TokenNodeType.INCREMENT_AFTER:
       case TokenNodeType.DECREMENT_AFTER:
         evaluate(node)
-        break
-      case TokenNodeType.DROP:
         break
       default:
         throw new RuntimeException("Unhandled node type $node.type")
@@ -205,7 +192,7 @@ class Evaluator {
       }
       return OPERATOR_MAP.get(e.type).call(arg1, arg2)
     } else if (e.type.value) {
-      return e.value
+      return  e.value
     }
     switch (e.type) {
       case TokenNodeType.VAR_REF:
@@ -213,20 +200,14 @@ class Evaluator {
       case TokenNodeType.D_REF:
         return dequeMap.findSymbol(e.getChild(0).value).slot
       case TokenNodeType.TAB_REF:
-        int index = evaluate(e.getChild(0)) + 1 //because 0 is the tab variable itself
+        int index = evaluate(e.getChild(0))
         Symbol s = dequeMap.findSymbol(e.value)
-        if (s.type == Type.STRING) {
-          String str = s.value
-          if (index >= str.size()) {
-            throw new PointerException("Tried to access character $index of string \"$str\"", e)
-          }
-          return str.charAt(index - 1)
+        def array = s.value
+        if (array.size() <= index) {
+          throw new PointerException("Tried to access element at index $index of array $e.value " +
+              "with size ${array.size()}", e)
         }
-        if (s.slot + index > nbSlot) {
-          throw new PointerException("Tried to access element $index of array $e.value", e)
-        }
-        Symbol pointedSymbol = dequeMap.findSymbolWithSlot(s.slot + index)
-        return pointedSymbol.value
+        return array[index]
       case TokenNodeType.INCREMENT_BEFORE:
       case TokenNodeType.DECREMENT_BEFORE:
       case TokenNodeType.INCREMENT_AFTER:

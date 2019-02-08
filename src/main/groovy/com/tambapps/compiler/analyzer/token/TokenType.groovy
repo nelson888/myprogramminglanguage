@@ -1,5 +1,8 @@
 package com.tambapps.compiler.analyzer.token
 
+import com.tambapps.compiler.util.Array
+import com.tambapps.compiler.util.Symbol
+
 import java.util.stream.Stream
 
 enum TokenType {
@@ -27,7 +30,7 @@ enum TokenType {
   VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_BOOL('bool'),
 
   //values
-  STRING('\"(.*?)\"', {String v -> v.substring(1, v.length() - 1) }),
+  STRING('\"(.*?)\"', {String v -> new Array(Symbol.Type.CHAR, v.substring(1, v.length() - 1).toCharArray()) }),
   CHAR("'(.*?)'", {String v -> v.charAt(1)}),
   INT('-?[0-9]+', Integer.&parseInt),
   FLOAT('-?([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+)', Float.&parseFloat),

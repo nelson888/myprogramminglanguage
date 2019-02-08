@@ -40,6 +40,8 @@ class Symbol {
   enum Type {
     STRING("", TokenNodeType.STRING), CHAR(' ' as Character, TokenNodeType.CHAR),
     INT(0, TokenNodeType.INT), FLOAT(0f, TokenNodeType.FLOAT), ANY(0, null),
+    ARR_INT([], TokenNodeType.ARRAY),
+    ARR_FLOAT([], TokenNodeType.ARRAY), //arr_char is string
     FUNCTION(null, null) //TODO? function as variable?
 
     final def defaultValue
@@ -53,6 +55,8 @@ class Symbol {
     boolean isType(def value) {
       if (this == ANY) return true
       switch (value.getClass()) {
+        case Array:
+          return value.type == arrElementType()
         case Integer:
           if (this == FLOAT) return true
         case Character:
@@ -77,6 +81,8 @@ class Symbol {
 
     static Type fromValue(def value) {
       switch (value.getClass()) {
+        case Array:
+          return arrayType(value.type)
         case Integer:
         case Boolean:
           return INT
@@ -87,6 +93,44 @@ class Symbol {
         case Float:
           return FLOAT
       }
+    }
+
+    boolean isArrayType() {
+      return isAny() || this == STRING || name().startsWith("ARR_")
+    }
+
+    boolean isAny() {
+      return this == ANY
+    }
+
+    Type arrElementType() {
+      if (!isArrayType()) return null
+      if (isAny()) return ANY
+      if (this == STRING) return CHAR
+      return valueOf(name().replace("ARR_", ""))
+    }
+
+    static Type arrayType(Type t) {
+      if (t == CHAR) {
+        return STRING
+      } else if (this == ANY) {
+        return ANY
+      }
+      return valueOf("ARR_" + t.name())
+    }
+
+    Type elementType() {
+      if (this == STRING) {
+        return CHAR
+      }
+      if (isAny()) {
+        return ANY
+      }
+      String name = name()
+      if (!name.startsWith("ARR_")) {
+        return null
+      }
+      return valueOf(name.replace("ARR_", ""))
     }
   }
 
