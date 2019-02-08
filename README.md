@@ -39,9 +39,7 @@ The output will be display on the console, in the bottom of the window
 TODO
 
 ## Arrays
-TODO revoir structure array?
-TODO handle string arrays
-
+TODO ne plus specifier la taille 
 
 ### Arithmetic expressions
 It supports basic and boolean operators

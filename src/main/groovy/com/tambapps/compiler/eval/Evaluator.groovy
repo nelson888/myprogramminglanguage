@@ -141,7 +141,11 @@ class Evaluator {
       case TokenNodeType.PRINT:
         def value = evaluate(node.getChild(0))
         if (value instanceof Array) {
-          value = value.array
+          if (value.type == Type.CHAR) {
+            value = value.array.inject("") {s, c -> s + c}
+          } else {
+            value = value.array
+          }
         }
         printer(value)
         break
@@ -195,6 +199,12 @@ class Evaluator {
       return  e.value
     }
     switch (e.type) {
+      case TokenNodeType.ARRAY:
+        def list = []
+        for (int i = 0; i < e.nbChildren(); i++) {
+          list.add(evaluate(e.getChild(i)))
+        }
+        return new Array(e, list)
       case TokenNodeType.VAR_REF:
         return dequeMap.findSymbol(e.value).value
       case TokenNodeType.D_REF:

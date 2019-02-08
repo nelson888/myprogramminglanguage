@@ -30,10 +30,10 @@ enum TokenType {
   VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_BOOL('bool'),
 
   //values
-  STRING('\"(.*?)\"', {String v -> new Array(Symbol.Type.CHAR, v.substring(1, v.length() - 1).toCharArray()) }),
+  STRING('\"(.*?)\"', {String v -> new Array(Symbol.Type.CHAR, v.substring(1, v.length() - 1)) }),
   CHAR("'(.*?)'", {String v -> v.charAt(1)}),
-  INT('-?[0-9]+', Integer.&parseInt),
   FLOAT('-?([0-9]+\\.[0-9]*)|([0-9]*\\.[0-9]+)', Float.&parseFloat),
+  INT('-?[0-9]+', Integer.&parseInt),
   TRUE('true', { v -> true }), FALSE('false', { v -> false }),
 
   IDENTIFIER('[a-zA-Z0-9]+', { v -> v}),

@@ -84,7 +84,16 @@ class Parser { //Syntax analyzer
         Token identTok = accept(TokenType.IDENTIFIER)
         TokenNode identNode = new TokenNode(identTok, TokenNodeType.VAR_REF, [name: identTok.value])
         return new TokenNode(t, type, null).withChildren(identNode)
-
+      case TokenType.BRACKET_OPEN: //array
+        TokenNode arrNode = new TokenNode(t, TokenNodeType.ARRAY)
+        while (getCurrent().type != TokenType.BRACKET_CLOSE) {
+          arrNode.addChild(atome())
+          if (getCurrent().type == TokenType.COMMA) {
+            accept(TokenType.COMMA)
+          }
+        }
+        accept(TokenType.BRACKET_CLOSE)
+        return arrNode
     }
     throw new ParsingException("Unexpected token $t.type encountered", t.l, t.c)
   }
