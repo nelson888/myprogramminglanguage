@@ -24,7 +24,24 @@ that will be executed.
 The output will be display on the console, in the bottom of the window
 
 ## What is supported (currently)
-This compiler can compile
+
+### Types
+
+## Integer
+
+## Float
+
+## Character
+
+## String
+
+## Boolean
+TODO
+
+## Arrays
+TODO revoir structure array?
+TODO handle string arrays
+
 
 ### Arithmetic expressions
 It supports basic and boolean operators
@@ -62,10 +79,16 @@ while (i < 10) {
 ```
 You can print the value of variable with the `print` function
 
-## Types
-bblablabla
-bool is considered as an int
+
 ## Other features
+
+### final variables
+TODO
+
+### switch
+TODO
+avec valeur et aussi avec type?? (case int:)
+
 
 ### String as char[]
 string can be considered as char array, and are therefore mutable
@@ -76,7 +99,7 @@ s[0] = 'y';
 char c = s[2];
 print(s);
 ```
-
+TODO: itialization of assignement between char[] string and vice-versa
 ### Break, Continue
 DONE
 
