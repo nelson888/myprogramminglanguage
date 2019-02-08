@@ -18,6 +18,10 @@ class Array {
     }
   }
 
+  Array(Type type) {
+    this.type = type
+  }
+
   Array(TokenNode node, List list) {
     if (list.size() == 0) {
       type = Type.ANY
@@ -57,5 +61,9 @@ class Array {
     } else {
       array[index] = value
     }
+  }
+
+  void append(def value) {
+    array.add(value)
   }
 }

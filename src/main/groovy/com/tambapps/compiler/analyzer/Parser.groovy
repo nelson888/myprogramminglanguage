@@ -151,11 +151,14 @@ class Parser { //Syntax analyzer
           accept(TokenType.SEMICOLON)
           return seq
         } else if (getCurrent().type == TokenType.BRACKET_OPEN) { //var tab[n];
+          TokenNode tabDeclNode = new TokenNode(tokIdent, TokenNodeType.TAB_DECL, declValue)
           accept(TokenType.BRACKET_OPEN)
-          TokenNode index = expression()
+          if (getCurrent().type != TokenType.BRACKET_CLOSE) {
+            tabDeclNode.addChild(expression()) //index
+          }
           accept(TokenType.BRACKET_CLOSE)
           accept(TokenType.SEMICOLON)
-          return new TokenNode(tokIdent, TokenNodeType.TAB_DECL, declValue).withChildren(index)
+          return tabDeclNode
         }
         throw new ParsingException("Expected token $TokenType.SEMICOLON or $TokenType.ASSIGNMENT", tokIdent.l, tokIdent.c)
 

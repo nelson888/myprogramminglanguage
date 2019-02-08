@@ -51,9 +51,14 @@ class Evaluator {
         Symbol s = dequeMap.newSymbol(tabName)
         s.slot = nbSlot++
         s.type = Type.arrayType(node.value.type)
-        int size = evaluate(node.getChild(0), Type.INT)
-        s.value = new Object[size]
-        Arrays.fill(s.value, defaultValue)
+        s.value = new Array(node.value.type)
+        if (node.nbChildren() > 0) {
+          int size = evaluate(node.getChild(0), Type.INT)
+          for (int i = 0; i < size; i++) {
+            s.value.append(defaultValue)
+          }
+        }
+
         break
       case TokenNodeType.BLOC:
         dequeMap.newBlock()
