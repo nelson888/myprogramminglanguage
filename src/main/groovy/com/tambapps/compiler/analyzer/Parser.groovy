@@ -175,8 +175,11 @@ class Parser { //Syntax analyzer
           N.addChild(statement())
         }
         return N
-      case TokenType.SWITCH: //switch node with caseNodes as children
+      case TokenType.SWITCH: //switch node child1: value children2..n: caseNodes
         TokenNode N = new TokenNode(accept(TokenType.SWITCH))
+        accept(TokenType.PARENT_OPEN)
+        N.addChild(expression())
+        accept(TokenType.PARENT_CLOSE)
         accept(TokenType.ACCOLADE_OPEN)
         List<TokenNode> caseNodes = []
         while (getCurrent().type != TokenType.ACCOLADE_CLOSE) {
@@ -197,9 +200,7 @@ class Parser { //Syntax analyzer
           }
         }
         accept(TokenType.ACCOLADE_CLOSE)
-        for (def caseNode : caseNodes) {
-          N.addChild(caseNode)
-        }
+        caseNodes.each { N.addChild(it) }
         return N
       case TokenType.ACCOLADE_OPEN:
         TokenNode N = new TokenNode(accept(TokenType.ACCOLADE_OPEN))

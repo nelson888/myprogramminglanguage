@@ -115,6 +115,32 @@ class Evaluator {
           process(node.getChild(2))
         }
         break
+      case TokenNodeType.SWITCH://TODO TO TEST
+        def value = evaluate(node.getChild(0))
+        TokenNode caseNode = node.childrenIterator().find {it.type == TokenNodeType.CASE && evaluate(it.getChild(0)) == value }
+        if (!caseNode) { // if no case, look for default case
+          caseNode = node.childrenIterator().find {it.type == TokenNodeType.CASE && it.nbChildren() == 1}
+        }
+        if (!caseNode) {
+          break
+        }
+        for (def statement : caseNode.childrenIterator()) {
+          process(statement)
+          if (!loopInterruptQueue.empty) {
+            def type = loopInterruptQueue.remove()
+            if (type == TokenNodeType.BREAK) { //continue is already handled
+              break
+            } else if (type == TokenNodeType.CONTINUE) {
+              if (loops == 0) {
+                throw new IllegalStatementException("Can't use CONTINUE outside of a loop", node)
+              }
+              break
+            }
+          }
+        }
+
+        switches--
+        break
       case TokenNodeType.LOOP:
         TokenNode condNode = node.getChild(0)
         TokenNode testNode = condNode.getChild(0)

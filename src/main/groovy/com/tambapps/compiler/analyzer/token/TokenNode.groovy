@@ -55,6 +55,10 @@ class TokenNode extends AbstractToken {
     return children.last()
   }
 
+  Iterator<TokenNode> childrenIterator() {
+    return children.iterator()
+  }
+
   boolean replaceChild(TokenNode child, TokenNode newChild) {
     for (int i = 0; i < nbChildren(); i++) {
       if (getChild(i) == child) {
