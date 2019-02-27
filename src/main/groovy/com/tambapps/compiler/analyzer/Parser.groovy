@@ -42,7 +42,7 @@ class Parser { //Syntax analyzer
         if (getCurrent().type == TokenType.PARENT_OPEN) {
           accept(TokenType.PARENT_OPEN)
           TokenNode N = new TokenNode(t, TokenNodeType.FUNCTION_CALL, [name: t.value])
-          while(getCurrent().type != TokenType.PARENT_CLOSE) {
+          while (getCurrent().type != TokenType.PARENT_CLOSE) {
             N.addChild(expression()) //arg of function
             if (getCurrent().type == TokenType.PARENT_CLOSE) {
               break
@@ -59,7 +59,7 @@ class Parser { //Syntax analyzer
         } else if (getCurrent().type in [TokenType.INCREMENT, TokenType.DECREMENT]) {
           TokenNodeType type = getCurrent().type == TokenType.INCREMENT ?
               TokenNodeType.INCREMENT_AFTER : TokenNodeType.DECREMENT_AFTER
-              moveForward()
+          moveForward()
           TokenNode identNode = new TokenNode(t, TokenNodeType.VAR_REF, [name: t.value])
           return new TokenNode(t, type, null).withChildren(identNode)
         }
@@ -235,17 +235,17 @@ class Parser { //Syntax analyzer
     }
   }
 
-  private TokenNode programme(){
-    TokenNode p = new TokenNode(TokenNodeType.PROG, 0,0)
+  private TokenNode programme() {
+    TokenNode p = new TokenNode(TokenNodeType.PROG, 0, 0)
     while (getCurrent().type != TokenType.END_OF_FILE) {
       p.addChild(fonction())
     }
     return p
   }
 
-  private TokenNode fonction(){
+  private TokenNode fonction() {
     Token t = accept(TokenType.IDENTIFIER)
-    TokenNode n = new TokenNode(t,TokenNodeType.FUNCTION, [name: t.value])
+    TokenNode n = new TokenNode(t, TokenNodeType.FUNCTION, [name: t.value])
     accept(TokenType.PARENT_OPEN)
     while (getCurrent().type != TokenType.PARENT_CLOSE) {
       Token typeTok = getCurrent()
@@ -254,8 +254,8 @@ class Parser { //Syntax analyzer
         throw new ParsingException("Expected type for argument variable", typeTok.l, typeTok.c)
       }
       Token acc = accept(TokenType.IDENTIFIER)
-      n.addChild(new TokenNode(acc,TokenNodeType.VAR_DECL, [name: acc.value, type: VAR_TYPE_MAP.get(typeTok.type)]))
-      if (getCurrent().type == TokenType.COMMA){
+      n.addChild(new TokenNode(acc, TokenNodeType.VAR_DECL, [name: acc.value, type: VAR_TYPE_MAP.get(typeTok.type)]))
+      if (getCurrent().type == TokenType.COMMA) {
         accept(TokenType.COMMA)
       }
     }
