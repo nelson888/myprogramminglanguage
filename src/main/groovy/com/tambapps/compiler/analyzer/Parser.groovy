@@ -24,10 +24,10 @@ class Parser { //Syntax analyzer
    */
   TokenNode parse(tokens) {
     this.tokens = tokens
-    return programme()
+    return program()
   }
 
-  private TokenNode atome() {
+  private TokenNode atom() {
     Token t = getCurrent()
     moveForward()
     switch (t.type) {
@@ -68,7 +68,7 @@ class Parser { //Syntax analyzer
       case TokenType.MINUS:
       case TokenType.NOT:
       case TokenType.MULTIPLY: //gerer déreferencement
-        TokenNode node = atome()
+        TokenNode node = atom()
         return new TokenNode(TokenUtils.UNARY_OPERATOR_MAP.get(t.type), t, [node])
       case TokenType.PARENT_OPEN:
         TokenNode node = expression()
@@ -87,7 +87,7 @@ class Parser { //Syntax analyzer
       case TokenType.BRACKET_OPEN: //array
         TokenNode arrNode = new TokenNode(t, TokenNodeType.ARRAY)
         while (getCurrent().type != TokenType.BRACKET_CLOSE) {
-          arrNode.addChild(atome())
+          arrNode.addChild(atom())
           if (getCurrent().type == TokenType.COMMA) {
             accept(TokenType.COMMA)
           }
@@ -112,7 +112,7 @@ class Parser { //Syntax analyzer
   }
 
   private TokenNode expression(int maxP) {
-    TokenNode A = atome()
+    TokenNode A = atom()
     Token T = getCurrent()
     while (T.type.isBinaryOperator() && PRIORITY_MAP.get(T.type) < maxP) {
       moveForward()
@@ -257,15 +257,15 @@ class Parser { //Syntax analyzer
     }
   }
 
-  private TokenNode programme() {
+  private TokenNode program() {
     TokenNode p = new TokenNode(TokenNodeType.PROG, 0, 0)
     while (getCurrent().type != TokenType.END_OF_FILE) {
-      p.addChild(fonction())
+      p.addChild(function())
     }
     return p
   }
 
-  private TokenNode fonction() {
+  private TokenNode function() {
     Token t = accept(TokenType.IDENTIFIER)
     TokenNode n = new TokenNode(t, TokenNodeType.FUNCTION, [name: t.value])
     accept(TokenType.PARENT_OPEN)
