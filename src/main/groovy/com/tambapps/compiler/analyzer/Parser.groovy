@@ -175,6 +175,28 @@ class Parser { //Syntax analyzer
           N.addChild(statement())
         }
         return N
+      case TokenType.SWITCH: //switch node with caseNodes as children
+        TokenNode N = new TokenNode(accept(TokenType.SWITCH))
+        accept(TokenType.ACCOLADE_OPEN)
+        List<TokenNode> caseNodes = []
+        while (getCurrent().type != TokenType.ACCOLADE_CLOSE) {
+          if (getCurrent().type == TokenType.CASE) { //caseNode child1: value child2: seq statement
+            Token ct = accept(TokenType.CASE)
+            caseNodes.add(new TokenNode(ct)
+                .withChildren(expression(), new TokenNode(ct, TokenNodeType.SEQ)))
+          } else {
+            if (caseNodes.isEmpty()) {
+              throw new ParsingException("Expected token CASE", getCurrent().l, getCurrent().c)
+            }
+            caseNodes*.getChild(1) //get the seq child of the case Node
+                *.addChild(statement())
+          }
+        }
+        accept(TokenType.ACCOLADE_CLOSE)
+        for (def caseNode : caseNodes) {
+          N.addChild(caseNode)
+        }
+        return N
       case TokenType.ACCOLADE_OPEN:
         TokenNode N = new TokenNode(accept(TokenType.ACCOLADE_OPEN))
         while (getCurrent().type != TokenType.ACCOLADE_CLOSE) {

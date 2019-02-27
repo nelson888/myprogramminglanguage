@@ -26,8 +26,10 @@ enum TokenType {
   ACCOLADE_CLOSE('\\}'), BRACKET_OPEN('\\['), BRACKET_CLOSE('\\]'),
 
   //key words
-  IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'), BREAK('break'), CONTINUE('continue'),
-  VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'), TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_BOOL('bool'),
+  IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'),
+  BREAK('break'), CONTINUE('continue'), VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'),
+  TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_BOOL('bool'), SWITCH('switch'), CASE('case'),
+  DEFAULT('default'),
 
   //values
   STRING('\"(.*?)\"', {String v -> new Array(Symbol.Type.CHAR, v.substring(1, v.length() - 1)) }),
