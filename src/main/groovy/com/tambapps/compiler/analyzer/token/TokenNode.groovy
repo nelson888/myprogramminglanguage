@@ -48,6 +48,13 @@ class TokenNode extends AbstractToken {
     return children.get(i)
   }
 
+  TokenNode getLastChild() {
+    if (children.isEmpty()) {
+      throw new IndexOutOfBoundsException("Don't have any children")
+    }
+    return children.last()
+  }
+
   boolean replaceChild(TokenNode child, TokenNode newChild) {
     for (int i = 0; i < nbChildren(); i++) {
       if (getChild(i) == child) {

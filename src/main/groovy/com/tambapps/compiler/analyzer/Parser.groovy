@@ -180,15 +180,19 @@ class Parser { //Syntax analyzer
         accept(TokenType.ACCOLADE_OPEN)
         List<TokenNode> caseNodes = []
         while (getCurrent().type != TokenType.ACCOLADE_CLOSE) {
-          if (getCurrent().type == TokenType.CASE) { //caseNode child1: value child2: seq statement
+          if (getCurrent().type == TokenType.CASE) { //caseNode child1: value child2: statement seq EXCEPT default case
             Token ct = accept(TokenType.CASE)
             caseNodes.add(new TokenNode(ct)
                 .withChildren(expression(), new TokenNode(ct, TokenNodeType.SEQ)))
+          } else if (getCurrent().type == TokenType.DEFAULT) { //defaultCaseNode child1: statement seq
+            Token ct = accept(TokenType.DEFAULT)
+            caseNodes.add(new TokenNode(ct)
+                .withChildren(new TokenNode(ct, TokenNodeType.SEQ)))
           } else {
             if (caseNodes.isEmpty()) {
               throw new ParsingException("Expected token CASE", getCurrent().l, getCurrent().c)
             }
-            caseNodes*.getChild(1) //get the seq child of the case Node
+            caseNodes*.lastChild //get the seq child of the case Node
                 *.addChild(statement())
           }
         }
