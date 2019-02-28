@@ -201,7 +201,7 @@ class Evaluator {
         evaluate(node)
         break
       default:
-        throw new RuntimeException("Unhandled node type $node.type")
+        throw new EvaluationException("Unhandled node type $node.type", node.l, node.c)
     }
   }
 
@@ -289,6 +289,9 @@ class Evaluator {
 
   def functionCall(TokenNode e) {
     TokenNode function = functions.find({ f -> e.value.name == f.value.name })
+    if (function == null) { // function not found
+      throw new EvaluationException("Couldn't find function $e.value.name", e.l, e.c)
+    }
     int nbArgs = function.nbChildren() - 1
     int nbChildren = e.nbChildren()
     if (nbChildren != nbArgs) {

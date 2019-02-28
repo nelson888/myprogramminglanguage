@@ -27,6 +27,16 @@ class Parser { //Syntax analyzer
     return program()
   }
 
+  TokenNode parseFunc(tokens) {
+    this.tokens = tokens
+    return function()
+  }
+
+  TokenNode parseInstructions(tokens) {
+    this.tokens = tokens
+    return instructions()
+  }
+
   private TokenNode atom() {
     Token t = getCurrent()
     moveForward()
@@ -268,6 +278,14 @@ class Parser { //Syntax analyzer
     TokenNode p = new TokenNode(TokenNodeType.PROG, 0, 0)
     while (getCurrent().type != TokenType.END_OF_FILE) {
       p.addChild(function())
+    }
+    return p
+  }
+
+  private TokenNode instructions() {
+    TokenNode p = new TokenNode(TokenNodeType.SEQ, 0, 0)
+    while (getCurrent().type != TokenType.END_OF_FILE) {
+      p.addChild(statement())
     }
     return p
   }
