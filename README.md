@@ -84,9 +84,23 @@ You can print the value of variable with the `print` function
 TODO
 
 ### switch
-TODO
-avec valeur et aussi avec type?? (case int:)
+You can use `switch` like in the following example:
 
+
+```java
+switch (a) {
+  default:
+    print("No match");
+  case 1:
+    print("1 case");
+    break;
+  case 2:
+  case 3:
+    print("2 and 3case");
+  case 4:
+    print("4 case");
+}
+```
 
 ### String as char[]
 string can be considered as char array, and are therefore mutable
@@ -99,10 +113,37 @@ print(s);
 ```
 TODO: itialization of assignement between char[] string and vice-versa
 ### Break, Continue
-DONE
+`break` and `continue` are handled. Here are a few example
+```java
+int a = 2;
+while(a < 10) {
+  if (a % 2 == 0) {
+    continue;
+  }
+  if (a == 5) {
+    break;
+  }
+  a = somethingElse();
+}
+```
+
+
+```java
+switch (a) {
+  case 1:
+    print("1");
+    break;
+  case 2:
+    print("2");
+    break;
+}
+```
 
 ### Ternary
-TODO
+You can also use expressions like
+```java
+a >= b ? a : b
+```
 
 ## Error handling
 When there is an error while compiling, the error is displayed on the console

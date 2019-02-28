@@ -14,7 +14,7 @@ enum TokenType {
 
   //operators
   NOT('!'),// unary operator
-  QUESTION_MARK('\\?'), TERNARY_SEPARATOR(':'), //ternary
+  QUESTION_MARK('\\?'), COLON(':'),
   INCREMENT('\\+\\+'), DECREMENT('\\-\\-'),
   PLUS('\\+'), MINUS('-'), // unary or binary operator
   DIVIDE('/'), MULTIPLY('\\*'), POWER('\\*\\*'), MODULO('%'), // binary operator

@@ -104,7 +104,7 @@ class Parser { //Syntax analyzer
       //terNode children: 1)evaluation 2)true value 3)false value
       TokenNode terNode = new TokenNode(accept(TokenType.QUESTION_MARK))
       terNode.addChildren(expr, expression())
-      accept(TokenType.TERNARY_SEPARATOR)
+      accept(TokenType.COLON)
       terNode.addChild(expression())
       return terNode
     }
@@ -187,10 +187,12 @@ class Parser { //Syntax analyzer
             Token ct = accept(TokenType.CASE)
             caseNodes.add(new TokenNode(ct)
                 .withChildren(expression(), new TokenNode(ct, TokenNodeType.SEQ)))
+            accept(TokenType.COLON)
           } else if (getCurrent().type == TokenType.DEFAULT) { //defaultCaseNode child1: statement seq
             Token ct = accept(TokenType.DEFAULT)
             caseNodes.add(new TokenNode(ct)
                 .withChildren(new TokenNode(ct, TokenNodeType.SEQ)))
+            accept(TokenType.COLON)
           } else {
             if (caseNodes.isEmpty()) {
               throw new ParsingException("Expected token CASE", getCurrent().l, getCurrent().c)
