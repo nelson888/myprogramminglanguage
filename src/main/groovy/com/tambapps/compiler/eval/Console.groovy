@@ -8,6 +8,11 @@ import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
 
+/* TODO implement ConsoleEvaluator extends Evaluator with function with special behavior. e.g:
+ exit() => exit(0)
+ exit(int) => exit with the argument value
+
+*/
 class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
@@ -19,11 +24,24 @@ class Console {
   void scan() {
     Scanner scanner = new Scanner(System.in)
     String code = ''
+    println('Welcome to the myprogramminglanguage terminal')
+    println("To define a function, start with the 'def' keywords")
+    println("You can write instructions, put ';' at the end to interpret them")
+    println()
     while (true) {
       code += ' ' + scanner.nextLine().trim()
-      if (code.trim().endsWith(';')) { //TODO find a way to not having to put ';' for func def
-        boolean isFuncDef = code.startsWith(FUNC_DEF_KEYWORD)
-        process(isFuncDef ? code.substring(FUNC_DEF_KEYWORD.length()) : code, isFuncDef)
+      code = code.trim()
+      if (code.startsWith(FUNC_DEF_KEYWORD)) {
+        int occOp = nbOcc(code, '{')
+        if (occOp > 0 && occOp == nbOcc(code, '}')) {
+          process(code.substring(FUNC_DEF_KEYWORD.length()), true)
+          code = ''
+        }
+      } else {
+        if (code.trim().endsWith(';')) {
+          process(code, false)
+          code = ''
+        }
       }
     }
   }
@@ -35,7 +53,7 @@ class Console {
       if (funcDef) {
         node = parser.parseFunc(tokens)
         functions.add(node)
-      } else {
+      } else { //TODO bug
         node = parser.parseInstructions(tokens)
         evaluator.process(node)
       }
@@ -55,6 +73,10 @@ class Console {
 
   private static void printlnErr(String text) {
     System.err.println(text)
+  }
+
+  private static int nbOcc(String text, String c) {
+    return text.findAll({ it == c }).size()
   }
 
   public static void main(String[] args) {
