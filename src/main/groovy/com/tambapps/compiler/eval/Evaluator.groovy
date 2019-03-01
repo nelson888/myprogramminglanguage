@@ -18,7 +18,7 @@ import com.tambapps.compiler.util.Symbol.Type
 
 class Evaluator {
 
-  private final List<TokenNode> functions
+  protected final List<TokenNode> functions
   private final Queue<TokenNodeType> loopInterruptQueue = new ArrayDeque<>()
   private int loops = 0 //number of nested loops
   private final Closure printer
@@ -205,7 +205,7 @@ class Evaluator {
     }
   }
 
-  private def evaluate(TokenNode n, Type type) {
+  protected def evaluate(TokenNode n, Type type) {
     def value = evaluate(n)
     if (!type.isType(value)) {
       throw new WrongTypeException(type, value, n)
@@ -213,7 +213,7 @@ class Evaluator {
     return value
   }
 
-  private def evaluate(TokenNode e) { //evaluates an expression
+  protected def evaluate(TokenNode e) { //evaluates an expression
     if (e.type.unaryOperator) {
       def arg = evaluate(e.getChild(0))
       Type type = Type.fromValue(arg)
@@ -292,13 +292,21 @@ class Evaluator {
     if (function == null) { // function not found
       throw new EvaluationException("Couldn't find function $e.value.name", e.l, e.c)
     }
+    functionCall(e, function)
+  }
+
+  static void throwArgsCountException(TokenNode e, int nbArgs, int nbChildren) {
+    throw new EvaluationException('There is ' +
+        (nbChildren < nbArgs ? 'not enough' : 'too much') +
+        " arguments to call function $e.value.name (expected $nbArgs, found $nbChildren)",
+        e.l, e.c)
+  }
+
+  def functionCall(TokenNode e, TokenNode function) {
     int nbArgs = function.nbChildren() - 1
     int nbChildren = e.nbChildren()
     if (nbChildren != nbArgs) {
-      throw new EvaluationException('There is ' +
-          (nbChildren < nbArgs ? 'not enough' : 'too much') +
-          " arguments to call function $function.value.name (expected $nbArgs, found $nbChildren)",
-          e.l, e.c)
+      throwArgsCountException(e, nbArgs, nbChildren)
     }
     Evaluator evaluator = new Evaluator(functions, printer)
     for (int i = 0; i < nbArgs; i++) {

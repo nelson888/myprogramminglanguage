@@ -1,4 +1,4 @@
-package com.tambapps.compiler.eval
+package com.tambapps.compiler.eval.console
 
 import com.tambapps.compiler.analyzer.LexicalAnalyzer
 import com.tambapps.compiler.analyzer.Parser
@@ -8,41 +8,49 @@ import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
 
-/* TODO implement ConsoleEvaluator extends Evaluator with function with special behavior. e.g:
+/* TODO implement CEvaluator extends Evaluator with function with special behavior. e.g:
  exit() => exit(0)
  exit(int) => exit with the argument value
 
 */
+//TODO  make to modes: single line mode and multiple line mode
 class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
+  private static final String PROMPT = '> '
   private final List<TokenNode> functions = []
+  private final List<CFunction> cFunctions = []
   private final LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer()
   private final Parser parser = new Parser()
-  private final Evaluator evaluator = new Evaluator(functions)
+  private final CEvaluator evaluator = new CEvaluator(functions, cFunctions, System.out.&println)
+  private boolean running
 
-  void scan() {
+  void prompt() {
     Scanner scanner = new Scanner(System.in)
     String code = ''
-    println('Welcome to the myprogramminglanguage terminal')
-    println("To define a function, start with the 'def' keywords")
-    println("You can write instructions, put ';' at the end to interpret them")
+    println('###    Welcome to the BOB language terminal                                ###')
+    println("###    To define a function, start with the 'def' keywords                 ###")
+    println("###    You can write instructions, put ';' at the end to interpret them    ###")
     println()
-    while (true) {
+    print(PROMPT)
+    running = true
+    while (running) {
       code += ' ' + scanner.nextLine().trim()
       code = code.trim()
+      int occOp = nbOcc(code, '{')
+      if (occOp > 0 && occOp == nbOcc(code, '}')) {
+        continue
+      }
       if (code.startsWith(FUNC_DEF_KEYWORD)) {
-        int occOp = nbOcc(code, '{')
-        if (occOp > 0 && occOp == nbOcc(code, '}')) {
-          process(code.substring(FUNC_DEF_KEYWORD.length()), true)
-          code = ''
-        }
+        process(code.substring(FUNC_DEF_KEYWORD.length()), true)
+        code = ''
       } else {
-        if (code.trim().endsWith(';')) {
+        if (code.endsWith(';')) {
           process(code, false)
           code = ''
         }
       }
+      print(PROMPT)
     }
   }
 
@@ -52,8 +60,11 @@ class Console {
       TokenNode node
       if (funcDef) {
         node = parser.parseFunc(tokens)
+        if (funcAlreadyExists(node.value.name)) {
+          throw new EvaluationException("Function already exists", node.c, node.l)
+        }
         functions.add(node)
-      } else { //TODO bug
+      } else {
         node = parser.parseInstructions(tokens)
         evaluator.process(node)
       }
@@ -79,7 +90,11 @@ class Console {
     return text.findAll({ it == c }).size()
   }
 
+  private boolean funcAlreadyExists(String name) {
+    return functions.find {name == it.value.name } || cFunctions.find {name == it.name }
+  }
+
   public static void main(String[] args) {
-    new Console().scan()
+    new Console().prompt()
   }
 }

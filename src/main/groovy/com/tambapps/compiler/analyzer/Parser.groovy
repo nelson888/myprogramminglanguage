@@ -32,8 +32,10 @@ class Parser { //Syntax analyzer
     return function()
   }
 
+  //for console
   TokenNode parseInstructions(tokens) {
     this.tokens = tokens
+    currentIndex = 0
     return instructions()
   }
 
