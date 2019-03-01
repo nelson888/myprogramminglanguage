@@ -346,4 +346,7 @@ class Evaluator {
     return dequeMap.symbolList()
   }
 
+  void clear(boolean variables, boolean functions) {
+    dequeMap.clear(variables, functions)
+  }
 }

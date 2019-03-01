@@ -73,4 +73,11 @@ class DequeMap {
     }
     return symbols
   }
+
+  void clear(boolean variables, boolean functions) {
+    for (def map : symbolsMap.descendingIterator()) {
+      map.entrySet().findAll { functions && it.value.function || variables && !it.value.function }
+          .each { map.remove(it.key) }
+    }
+  }
 }
