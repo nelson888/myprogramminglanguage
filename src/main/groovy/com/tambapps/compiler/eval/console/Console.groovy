@@ -32,7 +32,7 @@ class Console {
     String code = ''
     println('###    Welcome to the BOB language terminal                                ###')
     println("###    To define a function, start with the 'def' keywords                 ###")
-    println("###    You can write instructions, put ';' at the end to interpret them    ###")
+    println("###    If you want to write many instructions on a row, write them on a bloc ({ })   ###")
     println()
     print(PROMPT)
     running = true
@@ -40,7 +40,7 @@ class Console {
       code += ' ' + scanner.nextLine().trim()
       code = code.trim()
       int occOp = nbOcc(code, '{')
-      if (occOp > 0 && occOp == nbOcc(code, '}')) {
+      if (occOp > 0 && occOp != nbOcc(code, '}')) {
         continue
       }
       if (code.startsWith(FUNC_DEF_KEYWORD)) {
