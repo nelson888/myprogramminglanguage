@@ -10,7 +10,6 @@ import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
 
-//TODO don't return ARRAY on returnValue
 class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
