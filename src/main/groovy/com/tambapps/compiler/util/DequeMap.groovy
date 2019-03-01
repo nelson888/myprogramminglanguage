@@ -63,4 +63,14 @@ class DequeMap {
     }
     throw new SymbolException("Symbol not found")
   }
+
+  List<Symbol> symbolList() {
+    List<Symbol> symbols = []
+    for (def map : symbolsMap.descendingIterator()) {
+      for (def symbol : map.values()) {
+        symbols.add(symbol)
+      }
+    }
+    return symbols
+  }
 }

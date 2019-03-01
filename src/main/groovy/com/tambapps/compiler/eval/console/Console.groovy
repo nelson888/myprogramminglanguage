@@ -1,10 +1,11 @@
 package com.tambapps.compiler.eval.console
 
+import static com.tambapps.compiler.eval.Evaluator.VOID
+
 import com.tambapps.compiler.analyzer.LexicalAnalyzer
 import com.tambapps.compiler.analyzer.Parser
 import com.tambapps.compiler.analyzer.token.Token
 import com.tambapps.compiler.analyzer.token.TokenNode
-import com.tambapps.compiler.eval.Evaluator
 import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
@@ -14,12 +15,18 @@ class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
   private static final String PROMPT = '> '
+
   private final List<TokenNode> functions = []
   private final List<CFunction> cFunctions = []
   private final LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer()
   private final Parser parser = new Parser()
   private final CEvaluator evaluator = new CEvaluator(functions, cFunctions, System.out.&println)
   private boolean running
+
+  Console() {
+    cFunctions.addAll(CFunctions.getAll(evaluator))
+    cFunctions.add(new CFunction("exit", [], {running = false; VOID }))
+  }
 
   void prompt() {
     Scanner scanner = new Scanner(System.in)
@@ -44,8 +51,11 @@ class Console {
         process(code, false)
         code = ''
       }
-      print(PROMPT)
+      if (running) {
+        print(PROMPT)
+      }
     }
+    println("Exited terminal")
   }
 
   private void process(String text, boolean funcDef) {
@@ -61,7 +71,7 @@ class Console {
       } else {
         node = parser.parseInstructions(tokens)
         def value = evaluator.process(node)
-        if  (value != Evaluator.VOID) {
+        if  (value != VOID) {
           println(value)
         }
       }

@@ -342,4 +342,8 @@ class Evaluator {
     return n.type.value || n.type.unaryOperator || n.type in [TokenNodeType.VAR_REF, TokenNodeType.TAB_REF]
   }
 
+  List<Symbol> getAllSymbols() {
+    return dequeMap.symbolList()
+  }
+
 }
