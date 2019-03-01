@@ -55,7 +55,7 @@ class Console {
       if (funcDef) {
         node = parser.parseFunc(tokens)
         if (funcAlreadyExists(node.value.name)) {
-          throw new EvaluationException("Function already exists", node.c, node.l)
+          throw new EvaluationException("Function already exists", node.l, node.c)
         }
         functions.add(node)
       } else {

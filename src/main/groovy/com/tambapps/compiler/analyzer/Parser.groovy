@@ -138,6 +138,10 @@ class Parser { //Syntax analyzer
   }
 
   private TokenNode statement() {
+    return statement(true)
+  }
+
+  private TokenNode statement(boolean semiColonRequired) {
     Token t = getCurrent()
     switch (t.type) {
       case TokenType.TYPE_STRING:
@@ -146,12 +150,14 @@ class Parser { //Syntax analyzer
       case TokenType.TYPE_BOOL:
       case TokenType.FLOAT:
       case TokenType.VAR:
+        TokenNode varDeclNode
         moveForward()
         Token tokIdent = accept(TokenType.IDENTIFIER)
         def declValue = [name: tokIdent.value, type: VAR_TYPE_MAP.get(t.type)]
+        varDeclNode = new TokenNode(tokIdent, TokenNodeType.VAR_DECL, declValue)
         if (getCurrent().type == TokenType.SEMICOLON) {
           accept(TokenType.SEMICOLON)
-          return new TokenNode(tokIdent, TokenNodeType.VAR_DECL, declValue)
+          return varDeclNode
         } else if (getCurrent().type == TokenType.ASSIGNMENT) { //var ident = expr;
           Token assignToken = accept(TokenType.ASSIGNMENT)
           TokenNode seq = new TokenNode(assignToken, TokenNodeType.SEQ)
@@ -160,7 +166,7 @@ class Parser { //Syntax analyzer
           TokenNode assignTok = new TokenNode(assignToken, TokenNodeType.ASSIGNMENT, null)
           assignTok.addChildren(new TokenNode(tokIdent, TokenNodeType.VAR_REF, [name: tokIdent.value]), value)
           seq.addChildren(declTok, assignTok)
-          accept(TokenType.SEMICOLON)
+          accept(TokenType.SEMICOLON, semiColonRequired)
           return seq
         } else if (getCurrent().type == TokenType.BRACKET_OPEN) { //var tab[n];
           TokenNode tabDeclNode = new TokenNode(tokIdent, TokenNodeType.TAB_DECL, declValue)
@@ -169,11 +175,13 @@ class Parser { //Syntax analyzer
             tabDeclNode.addChild(expression()) //index
           }
           accept(TokenType.BRACKET_CLOSE)
-          accept(TokenType.SEMICOLON)
+          accept(TokenType.SEMICOLON, semiColonRequired)
           return tabDeclNode
         }
-        throw new ParsingException("Expected token $TokenType.SEMICOLON or $TokenType.ASSIGNMENT", tokIdent.l, tokIdent.c)
-
+        if (semiColonRequired) {
+          throw new ParsingException("Expected token $TokenType.SEMICOLON or $TokenType.ASSIGNMENT", tokIdent.l, tokIdent.c)
+        }
+        return varDeclNode
       case TokenType.IF: // if (test) S
         TokenNode N = new TokenNode(accept(TokenType.IF))
         accept(TokenType.PARENT_OPEN)
@@ -257,22 +265,22 @@ class Parser { //Syntax analyzer
         TokenNode print = new TokenNode(accept(TokenType.PRINT))
         TokenNode e = expression()
         print.addChild(e)
-        accept(TokenType.SEMICOLON)
+        accept(TokenType.SEMICOLON, semiColonRequired)
         return print
 
       case TokenType.RETURN:
         TokenNode n = new TokenNode(accept(TokenType.RETURN))
         n.addChild(expression())
-        accept(TokenType.SEMICOLON)
+        accept(TokenType.SEMICOLON, semiColonRequired)
         return n
       case TokenType.BREAK:
       case TokenType.CONTINUE:
         moveForward()
-        accept(TokenType.SEMICOLON)
+        accept(TokenType.SEMICOLON, semiColonRequired)
         return new TokenNode(t)
       default: // expression;
         TokenNode e = expression()
-        return new TokenNode(TokenNodeType.DROP, accept(TokenType.SEMICOLON), [e])
+        return new TokenNode(TokenNodeType.DROP, accept(TokenType.SEMICOLON, semiColonRequired), [e])
     }
   }
 
@@ -287,7 +295,7 @@ class Parser { //Syntax analyzer
   private TokenNode instructions() {
     TokenNode p = new TokenNode(TokenNodeType.SEQ, 0, 0)
     while (getCurrent().type != TokenType.END_OF_FILE) {
-      p.addChild(statement())
+      p.addChild(statement(false))
     }
     return p
   }
@@ -339,4 +347,13 @@ class Parser { //Syntax analyzer
     return token
   }
 
+  Token accept(TokenType t, boolean required) {
+    Token token = getCurrent()
+    if (token.type == t) {
+      moveForward()
+    } else if (required) {
+      throw new ParsingException("Expected token of type $t but got $token.type", token.l, token.c)
+    }
+    return new Token(token.l, token.c, token.value, t)
+  }
 }
