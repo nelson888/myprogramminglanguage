@@ -66,4 +66,9 @@ class Array {
   void append(def value) {
     array.add(value)
   }
+
+  @Override
+  String toString() {
+    return array
+  }
 }

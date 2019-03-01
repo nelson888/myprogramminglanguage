@@ -24,6 +24,10 @@ enum TokenNodeType {
                     EQUAL, NOT_EQUAL, STRICT_INF, STRICT_SUP, SUP, INF, AND, OR]
   }
 
+  boolean isOperator() {
+    return isBinaryOperator() || isUnaryOperator() || this in [INCREMENT_BEFORE, DECREMENT_BEFORE, INCREMENT_AFTER, DECREMENT_AFTER]
+  }
+
   boolean canOperate(Type arg1, Type arg2) {
     switch (this) {
       case PLUS_B:
@@ -42,8 +46,12 @@ enum TokenNodeType {
     return arg != Type.STRING
   }
 
-  boolean isValue() {
+  boolean isSimpleValue() {
     return this in [INT, CHAR, STRING, FLOAT]
+  }
+
+  boolean isValue() {
+    return simpleValue || this == ARRAY
   }
 
   @Override

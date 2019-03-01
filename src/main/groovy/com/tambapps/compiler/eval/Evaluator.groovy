@@ -18,12 +18,13 @@ import com.tambapps.compiler.util.Symbol.Type
 
 class Evaluator {
 
+  public static final def VOID = new Object()
   protected final List<TokenNode> functions
   private final Queue<TokenNodeType> loopInterruptQueue = new ArrayDeque<>()
   private int loops = 0 //number of nested loops
   private final Closure printer
   private DequeMap dequeMap
-  private def returnValue = null
+  private def returnValue = VOID
   private int nbSlot = 0
 
 
@@ -37,14 +38,17 @@ class Evaluator {
     this(functions, System.out.&println)
   }
 
-  void process(TokenNode node) throws EvaluationException {
+  def process(TokenNode node) throws EvaluationException {
+    if (isExpressionOrValue(node)) {
+      return evaluate(node)
+    }
     switch (node.type) {
       case TokenNodeType.VAR_DECL:
         Symbol s = dequeMap.newSymbol(node.value.name)
         s.slot = nbSlot++
         s.type = node.value.type
         s.value = s.type.defaultValue
-        break
+        return VOID
       case TokenNodeType.TAB_DECL: //child => size
         String tabName = node.value.name
         def defaultValue = node.value.type.defaultValue
@@ -58,8 +62,7 @@ class Evaluator {
             s.value.append(defaultValue)
           }
         }
-
-        break
+        return VOID
       case TokenNodeType.BLOC:
         dequeMap.newBlock()
         for (int i = 0; i < node.nbChildren(); i++) {
@@ -69,11 +72,11 @@ class Evaluator {
             if (loops == 0) {
               throw new IllegalStatementException("Can't use $type outside of a loop", node)
             }
-            break
+            return VOID
           }
         }
         dequeMap.endBlock()
-        break
+        return VOID
       case TokenNodeType.ASSIGNMENT:
         TokenNode left = node.getChild(0)
         Symbol s
@@ -91,7 +94,7 @@ class Evaluator {
             throw new WrongTypeException(elementType, value, node)
           }
           array[index] = value
-          break
+          return value
         }
         if (left.type == TokenNodeType.D_REF) {
           s = dequeMap.findSymbol(left.getChild(0).value)
@@ -106,7 +109,7 @@ class Evaluator {
           throw new WrongTypeException(s.type, value, node)
         }
         s.value = value
-        break
+        return value
       case TokenNodeType.COND:
         TokenNode condition = node.getChild(0)
         if (evaluate(condition)) {
@@ -114,7 +117,7 @@ class Evaluator {
         } else if (node.nbChildren() > 2) {
           process(node.getChild(2))
         }
-        break
+        return VOID
       case TokenNodeType.SWITCH:
         def value = evaluate(node.getChild(0))
         TokenNode caseNode = node.childrenIterator().find {
@@ -125,7 +128,7 @@ class Evaluator {
           caseNode = node.childrenIterator().find(Evaluator.&isDefaultCaseNode)
         }
         if (!caseNode) {
-          break
+          return VOID
         }
         TokenNode statementsNode = caseNode.lastChild
         for (def statement : statementsNode.childrenIterator()) {
@@ -133,17 +136,17 @@ class Evaluator {
           if (!loopInterruptQueue.empty) {
             def type = loopInterruptQueue.remove()
             if (type == TokenNodeType.BREAK) {
-              break
+              return VOID
             } else if (type == TokenNodeType.CONTINUE) {
               if (loops == 0) {
                 throw new IllegalStatementException("Can't use CONTINUE outside of a loop", node)
               }
               //'loops' decrement will be automatically done on the amounted call
-              break
+              return VOID
             }
           }
         }
-        break
+        return VOID
       case TokenNodeType.LOOP:
         TokenNode condNode = node.getChild(0)
         TokenNode testNode = condNode.getChild(0)
@@ -159,19 +162,17 @@ class Evaluator {
           }
         }
         loops--
-        break
+        return VOID
       case TokenNodeType.RETURN:
         if (node.nbChildren() > 0) {
           TokenNode returnExpression = node.getChild(0)
           returnValue = evaluate(returnExpression)
         }
-        break
+        return returnValue
       case TokenNodeType.FUNCTION_CALL: //like a procedure call
-        functionCall(node)
-        break
+        return functionCall(node)
       case TokenNodeType.TERNARY:
-        evaluate(node)
-        break
+        return evaluate(node)
       case TokenNodeType.PRINT:
         def value = evaluate(node.getChild(0))
         if (value instanceof Array) {
@@ -182,24 +183,27 @@ class Evaluator {
           }
         }
         printer(value)
-        break
+        return VOID
       case TokenNodeType.FUNCTION:
       case TokenNodeType.SEQ:
-      case TokenNodeType.DROP: //should have only 1 child
-        for (int i = 0; i < node.nbChildren(); i++) {
+        for (int i = 0; i < node.nbChildren() - 1; i++) {
           process(node.getChild(i))
         }
-        break
+        if (node.nbChildren() > 0) {
+          return process(node.lastChild)
+        }
+        return VOID
+      case TokenNodeType.DROP:
+        return process(node.getChild(0))
       case TokenNodeType.CONTINUE:
       case TokenNodeType.BREAK:
         loopInterruptQueue.add(node.type)
-        break
+        return VOID
       case TokenNodeType.INCREMENT_BEFORE:
       case TokenNodeType.DECREMENT_BEFORE:
       case TokenNodeType.INCREMENT_AFTER:
       case TokenNodeType.DECREMENT_AFTER:
-        evaluate(node)
-        break
+        return evaluate(node)
       default:
         throw new EvaluationException("Unhandled node type $node.type", node.l, node.c)
     }
@@ -229,7 +233,7 @@ class Evaluator {
         throw new NoSuchOperatorException(e.type, *types, e)
       }
       return OPERATOR_MAP.get(e.type).call(arg1, arg2)
-    } else if (e.type.value) {
+    } else if (e.type.simpleValue) {
       return  e.value
     }
     switch (e.type) {
@@ -274,7 +278,7 @@ class Evaluator {
         }
       case TokenNodeType.FUNCTION_CALL:
         def value = functionCall(e)
-        if (value == null) {
+        if (value == null || value == VOID) {
           throw new WrongTypeException("Expected a value to be returned from function $e.value.name",
               e.l, e.c)
         }
@@ -292,7 +296,7 @@ class Evaluator {
     if (function == null) { // function not found
       throw new EvaluationException("Couldn't find function $e.value.name", e.l, e.c)
     }
-    functionCall(e, function)
+    return functionCall(e, function)
   }
 
   static void throwArgsCountException(TokenNode e, int nbArgs, int nbChildren) {
@@ -333,4 +337,9 @@ class Evaluator {
   private static boolean isDefaultCaseNode(TokenNode node) {
     return node.type == TokenNodeType.CASE && node.nbChildren() == 1
   }
+
+  private static boolean isExpressionOrValue(TokenNode n) {
+    return n.type.value || n.type.unaryOperator || n.type in [TokenNodeType.VAR_REF, TokenNodeType.TAB_REF]
+  }
+
 }

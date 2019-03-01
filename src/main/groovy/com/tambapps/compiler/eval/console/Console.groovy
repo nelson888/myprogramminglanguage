@@ -4,16 +4,12 @@ import com.tambapps.compiler.analyzer.LexicalAnalyzer
 import com.tambapps.compiler.analyzer.Parser
 import com.tambapps.compiler.analyzer.token.Token
 import com.tambapps.compiler.analyzer.token.TokenNode
+import com.tambapps.compiler.eval.Evaluator
 import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
 
-/* TODO implement CEvaluator extends Evaluator with function with special behavior. e.g:
- exit() => exit(0)
- exit(int) => exit with the argument value
-
-*/
-//TODO  make to modes: single line mode and multiple line mode
+//TODO don't return ARRAY on returnValue
 class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
@@ -45,10 +41,8 @@ class Console {
         process(code.substring(FUNC_DEF_KEYWORD.length()), true)
         code = ''
       } else {
-        if (code.endsWith(';')) {
-          process(code, false)
-          code = ''
-        }
+        process(code, false)
+        code = ''
       }
       print(PROMPT)
     }
@@ -66,7 +60,10 @@ class Console {
         functions.add(node)
       } else {
         node = parser.parseInstructions(tokens)
-        evaluator.process(node)
+        def value = evaluator.process(node)
+        if  (value != Evaluator.VOID) {
+          println(value)
+        }
       }
     } catch (LexicalException e) {
       printlnErr('Error while performing lexical analysis')
