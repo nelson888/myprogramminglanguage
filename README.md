@@ -1,4 +1,5 @@
-# groovy_compiler
+# Bob programming language
+This is the basic programming language before it as been transformed to an image processing app
 
 ## Description
 This a simple compiler written in Groovy
