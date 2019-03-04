@@ -1,8 +1,11 @@
 package com.tambapps.compiler.eval.console
 
+import com.tambapps.compiler.util.Symbol
+
 import static com.tambapps.compiler.eval.Evaluator.VOID
 
 import com.tambapps.compiler.eval.Evaluator
+import com.tambapps.compiler.util.Symbol.Type
 
 final class CFunctions {
 
@@ -20,6 +23,7 @@ final class CFunctions {
         new CFunction("clearVars", [], clearVars),
         new CFunction("clearFuncs", [], clearFuncs),
         new CFunction("clearAll", [], clearAll),
+        new CFunction("typeof", [Type.ANY], {}, "get the type of a variable")
     ]
 
   }
