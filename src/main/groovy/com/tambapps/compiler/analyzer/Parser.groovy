@@ -144,6 +144,21 @@ class Parser { //Syntax analyzer
   private TokenNode statement(boolean semiColonRequired) {
     Token t = getCurrent()
     switch (t.type) {
+      case TokenType.CONST: //constDecl child1: value
+        moveForward()
+        Token varTypeTok = getCurrent()
+        if (!varTypeTok.type.varType) {
+          throw new ParsingException("Expected a variable type but got $varTypeTok.type",
+              varTypeTok.l, varTypeTok.c)
+        }
+        moveForward()
+        Token tokIdent = accept(TokenType.IDENTIFIER)
+        def declValue = [name: tokIdent.value, type: VAR_TYPE_MAP.get(varTypeTok.type)]
+        accept(TokenType.ASSIGNMENT)
+        TokenNode n = new TokenNode(tokIdent, TokenNodeType.CONST_DECL, declValue)
+            .withChildren(expression())
+        accept(TokenType.SEMICOLON, semiColonRequired)
+        return n
       case TokenType.TYPE_STRING:
       case TokenType.TYPE_CHAR:
       case TokenType.TYPE_INT:

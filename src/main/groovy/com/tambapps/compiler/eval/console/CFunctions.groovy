@@ -1,7 +1,5 @@
 package com.tambapps.compiler.eval.console
 
-import com.tambapps.compiler.util.Symbol
-
 import static com.tambapps.compiler.eval.Evaluator.VOID
 
 import com.tambapps.compiler.eval.Evaluator

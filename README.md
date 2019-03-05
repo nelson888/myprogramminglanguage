@@ -38,6 +38,10 @@ The output will be display on the console, in the bottom of the window
 ## Boolean
 TODO
 
+## Constants variables
+not for array
+example:
+const int a = 2;
 ## Arrays
 array declaration: taille optionnelle
 

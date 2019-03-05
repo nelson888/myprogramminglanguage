@@ -10,51 +10,63 @@ import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
 
+//TODO HANDLE final variable and then make string variables for type (STRING = "string") etc
 class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
   private static final String PROMPT = '> '
+  private static final String LINE_SEPARATOR = System.lineSeparator()
 
   private final List<TokenNode> functions = []
   private final List<CFunction> cFunctions = []
   private final LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer()
   private final Parser parser = new Parser()
   private final CEvaluator evaluator = new CEvaluator(functions, cFunctions, System.out.&println)
+  private String code = ''
   private boolean running
+  private Closure printer
 
   Console() {
+    this({ System.out.print(it) })
+  }
+
+  Console(Closure printer) {
     cFunctions.addAll(CFunctions.getAll(evaluator))
     cFunctions.add(new CFunction("exit", [], {running = false; VOID }))
+    this.printer = printer
   }
 
   void prompt() {
     Scanner scanner = new Scanner(System.in)
-    String code = ''
-    println('###    Welcome to the BOB language terminal                                ###')
-    println("###    To define a function, start with the 'def' keywords                 ###")
-    println("###    If you want to write many instructions on a row, write them on a bloc ({ })   ###")
+    println('###    Welcome to the BOB language terminal                   ###')
+    println("###    To define a function, start with the 'def' keywords    ###")
     println()
     print(PROMPT)
     running = true
+    code = ''
     while (running) {
-      code += ' ' + scanner.nextLine().trim()
-      code = code.trim()
-      int occOp = nbOcc(code, '{')
-      if (occOp > 0 && occOp != nbOcc(code, '}')) {
-        continue
-      }
-      if (code.startsWith(FUNC_DEF_KEYWORD)) {
-        process(code.substring(FUNC_DEF_KEYWORD.length()), true)
-        code = ''
-      } else {
-        process(code, false)
-        code = ''
-      }
-      if (running) {
-        print(PROMPT)
-      }
+      process(scanner.nextLine().trim())
     }
     println("Exited terminal")
+  }
+
+  private void process(String line) {
+    code += line
+    code = code.trim()
+    int occOp = nbOcc(code, '{')
+    if (occOp > 0 && occOp != nbOcc(code, '}')) {
+      return
+    }
+    if (code.startsWith(FUNC_DEF_KEYWORD)) {
+      process(code.substring(FUNC_DEF_KEYWORD.length()), true)
+      code = ''
+    } else {
+      process(code, false)
+      code = ''
+    }
+    if (running) {
+      print(PROMPT)
+    }
   }
 
   private void process(String text, boolean funcDef) {
@@ -100,7 +112,15 @@ class Console {
     return functions.find {name == it.value.name } || cFunctions.find {name == it.name }
   }
 
-  public static void main(String[] args) {
+  static void main(String[] args) {
     new Console().prompt()
+  }
+
+  void println(o) {
+    printer(String.valueOf(o) + LINE_SEPARATOR)
+  }
+
+  void print(o) {
+    printer(String.valueOf(o))
   }
 }

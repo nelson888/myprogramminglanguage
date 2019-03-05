@@ -10,6 +10,7 @@ class Symbol {
   int nbArgs = -1
   Type type
   def value //for evaluator
+  boolean constVar = false
 
   @PackageScope
   Symbol(String s) {

@@ -29,7 +29,7 @@ enum TokenType {
   IF('if'), ELSE('else'), FOR('for'), WHILE('while'), PRINT('print'), RETURN('return'),
   BREAK('break'), CONTINUE('continue'), VAR('var'), TYPE_STRING('string'), TYPE_CHAR('char'),
   TYPE_INT('int'), TYPE_FLOAT('float'), TYPE_BOOL('bool'), SWITCH('switch'), CASE('case'),
-  DEFAULT('default'),
+  DEFAULT('default'), CONST('const'),
 
   //values
   STRING('\"(.*?)\"', {String v -> new Array(Symbol.Type.CHAR, v.substring(1, v.length() - 1)) }),

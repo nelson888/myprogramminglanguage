@@ -62,6 +62,7 @@ class TokenUtils {
     typeMap.put(TokenType.SWITCH, TokenNodeType.SWITCH)
     typeMap.put(TokenType.CASE, TokenNodeType.CASE)
     typeMap.put(TokenType.DEFAULT, TokenNodeType.CASE)
+    typeMap.put(TokenType.CONST, TokenNodeType.CONST_DECL)
 
     Map<TokenType, Integer> priorityMap = new HashMap<>()
     priorityMap.put(TokenType.POWER, 1)

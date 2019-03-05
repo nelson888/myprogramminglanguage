@@ -49,6 +49,13 @@ class Evaluator {
         s.type = node.value.type
         s.value = s.type.defaultValue
         return VOID
+      case TokenNodeType.CONST_DECL:
+        Symbol s = dequeMap.newSymbol(node.value.name)
+        s.constVar = true
+        s.slot = nbSlot++
+        s.type = node.value.type
+        s.value = evaluate(node.getChild(0))
+        return s.value
       case TokenNodeType.TAB_DECL: //child => size
         String tabName = node.value.name
         def defaultValue = node.value.type.defaultValue
@@ -107,6 +114,10 @@ class Evaluator {
         }
         if (!s.type.isType(value)) {
           throw new WrongTypeException(s.type, value, node)
+        }
+        if (s.constVar) {
+          throw new EvaluationException("Cannot assign value to constant variable $s.ident",
+              node.l, node.c)
         }
         s.value = value
         return value
