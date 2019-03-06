@@ -21,7 +21,7 @@ final class CFunctions {
         new CFunction("clearVars", [], clearVars),
         new CFunction("clearFuncs", [], clearFuncs),
         new CFunction("clearAll", [], clearAll),
-        new CFunction("typeof", [Type.ANY], {}, "get the type of a variable")
+        new CFunction("typeof", [Type.ANY], { def t = Type.fromValue(it); return t ?: "UNKNOWN" }, "get the type of a variable")
     ]
 
   }

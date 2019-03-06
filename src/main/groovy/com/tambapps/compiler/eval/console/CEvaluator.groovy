@@ -36,7 +36,7 @@ class CEvaluator extends Evaluator {
       throwArgsCountException(argsNode, nbArgs, nbChildren)
     }
 
-    def argValues = []
+    List<Object> argValues = []
     for (int i = 0; i < nbArgs; i++) {
       Symbol.Type type = function.argTypes[i]
       def argValueNode = argsNode.getChild(i)
@@ -46,6 +46,6 @@ class CEvaluator extends Evaluator {
       }
       argValues += argValue
     }
-    return function.call(*argValues)
+    return function.closure.call(*argValues)
   }
 }

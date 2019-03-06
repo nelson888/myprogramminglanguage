@@ -350,7 +350,7 @@ class Evaluator {
   }
 
   private static boolean isExpressionOrValue(TokenNode n) {
-    return n.type.value || n.type.unaryOperator || n.type in [TokenNodeType.VAR_REF, TokenNodeType.TAB_REF]
+    return n.type.value || n.type.operator || n.type in [TokenNodeType.VAR_REF, TokenNodeType.TAB_REF]
   }
 
   List<Symbol> getAllSymbols() {

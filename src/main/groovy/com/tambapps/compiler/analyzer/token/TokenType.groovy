@@ -38,7 +38,7 @@ enum TokenType {
   INT('-?[0-9]+', Integer.&parseInt),
   TRUE('true', { v -> true }), FALSE('false', { v -> false }),
 
-  IDENTIFIER('[a-zA-Z0-9]+', { v -> v}),
+  IDENTIFIER('[a-zA-Z0-9_]+', { v -> v}),
   END_OF_FILE('EOF');
 
   final String value

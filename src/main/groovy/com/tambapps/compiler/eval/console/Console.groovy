@@ -34,6 +34,7 @@ class Console {
     cFunctions.addAll(CFunctions.getAll(evaluator))
     cFunctions.add(new CFunction("exit", [], {running = false; VOID }))
     this.printer = printer
+    CConstants.injectConstant {evaluator.process(parser.parseInstructions(lexicalAnalyzer.toTokens(it)))}
   }
 
   void prompt() {

@@ -9,6 +9,7 @@ class Array {
 
   Type type
   final List array = new ArrayList()
+  final boolean isString
 
   @PackageScope
   Array(Type type, String s) {
@@ -70,5 +71,13 @@ class Array {
   @Override
   String toString() {
     return array
+  }
+
+  @Override
+  boolean equals(Object o) {
+    if (o instanceof String) {
+
+    }
+    return super.equals(o)
   }
 }

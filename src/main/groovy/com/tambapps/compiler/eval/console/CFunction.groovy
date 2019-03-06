@@ -20,7 +20,7 @@ class CFunction {
     this(name, argTypes, closure, null)
   }
 
-  def call(def... args) {
+  def call(Object[] args) {
     return closure.call(args)
   }
 
