@@ -5,19 +5,18 @@ import javafx.scene.input.KeyCode
 
 import javax.swing.border.EtchedBorder
 import javax.swing.event.DocumentEvent
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.Font
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 
-class ConsolePane extends CodePane implements KeyListener {
+class PromptPane extends CodePane implements KeyListener {
 
-  //TODO add enter click listener
   Console console = new Console()
 
-  ConsolePane() {
+  PromptPane() {
     setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null))
-    setMinimumSize(new Dimension(0, 500))
     setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16))
     addKeyListener(this)
   }

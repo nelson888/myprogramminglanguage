@@ -2,8 +2,8 @@ package com.tambapps.compiler
 
 import com.tambapps.compiler.ui.bar.Menubar
 import com.tambapps.compiler.ui.pane.CodeEditorPane
-import com.tambapps.compiler.ui.pane.ConsolePane
 import com.tambapps.compiler.ui.bar.Toolbar
+import com.tambapps.compiler.ui.panel.ConsolePanel
 
 import javax.swing.JFrame
 import javax.swing.JSplitPane
@@ -27,10 +27,10 @@ splitPane.setOneTouchExpandable(true)
 splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT)
 frame.getContentPane().add(splitPane, BorderLayout.CENTER)
 
-ConsolePane consolePane = new ConsolePane()
+ConsolePanel consolePanel = new ConsolePanel()
 JTextPane outputPane = new JTextPane()
 outputPane.setEditable(false)
-splitPane.setTopComponent(consolePane)
+splitPane.setTopComponent(consolePanel)
 CodeEditorPane editorPane = new CodeEditorPane()
 splitPane.setBottomComponent(editorPane)
 
