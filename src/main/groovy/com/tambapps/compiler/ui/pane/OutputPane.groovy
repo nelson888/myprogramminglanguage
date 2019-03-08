@@ -1,5 +1,6 @@
 package com.tambapps.compiler.ui.pane
 
+import com.tambapps.compiler.eval.console.Console
 import com.tambapps.compiler.ui.style.Fonts
 
 import javax.swing.JScrollPane
@@ -21,7 +22,7 @@ class OutputPane extends JScrollPane implements TextColoring {
 
   }
 
-  void appendText(String text) {
-    textPane.text += "\n" + text
+  void appendText(def data) {
+    textPane.text += Console.LINE_SEPARATOR + data
   }
 }

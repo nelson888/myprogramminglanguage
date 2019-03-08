@@ -12,7 +12,6 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
 
   private final Console console
   private final OutputPane outputPane
-  private String output
 
   ConsolePanel() {
     setLayout(null)
@@ -24,7 +23,7 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
     setMinimumSize(new Dimension(0, 500))
     outputPane.setMinimumSize(new Dimension(0, 400))
 
-    console = new Console(outputPane.&appendText)
+    console = new Console(outputPane.&appendText, outputPane.&appendText)
   }
 
   @Override

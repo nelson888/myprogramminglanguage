@@ -7,7 +7,7 @@ class CFunction {
 
   final String name
   final List<Symbol.Type> argTypes
-  final Closure closure
+  Closure closure //may be redefined
   final String description
 
   CFunction(String name, List<Symbol.Type> argTypes, Closure closure, String description) {
@@ -25,5 +25,22 @@ class CFunction {
     return closure.call(args)
   }
 
+  boolean equals(o) {
+    if (this.is(o)) return true
+    if (getClass() != o.class) return false
 
+    CFunction cFunction = (CFunction) o
+
+    if (argTypes != cFunction.argTypes) return false
+    if (name != cFunction.name) return false
+
+    return true
+  }
+
+  int hashCode() {
+    int result
+    result = (name != null ? name.hashCode() : 0)
+    result = 31 * result + (argTypes != null ? argTypes.hashCode() : 0)
+    return result
+  }
 }

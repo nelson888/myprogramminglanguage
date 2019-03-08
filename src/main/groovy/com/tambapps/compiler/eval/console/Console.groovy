@@ -17,22 +17,25 @@ class Console {
   static final String LINE_SEPARATOR = System.lineSeparator()
 
   private final List<TokenNode> functions = []
-  private final List<CFunction> cFunctions = []
+  private final Set<CFunction> cFunctions = []
   private final LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer()
   private final Parser parser = new Parser()
-  private final CEvaluator evaluator = new CEvaluator(functions, cFunctions, System.out.&println)
+  private final CEvaluator evaluator
   private String code = ''
   private boolean running
   private Closure printer
+  private Closure printlnErr
 
   Console() {
-    this({ System.out.print(it) })
+    this({ System.out.&print }, { System.err.&println })
   }
 
-  Console(Closure printer) {
+  Console(Closure printer, Closure printlnErr) {
+    this.printer = printer
+    this.printlnErr = printlnErr
+    evaluator =  new CEvaluator(functions, cFunctions, printer)
     cFunctions.addAll(CFunctions.getAll(evaluator))
     cFunctions.add(new CFunction("exit", [], {running = false; VOID }))
-    this.printer = printer
     CConstants.injectConstant {evaluator.process(parser.parseInstructions(lexicalAnalyzer.toTokens(it)))}
   }
 
@@ -105,10 +108,6 @@ class Console {
       printlnErr('Error while evaluating instructions')
       printlnErr("$e.message")
     }
-  }
-
-  private static void printlnErr(String text) {
-    System.err.println(text)
   }
 
   private static int nbOcc(String text, String c) {

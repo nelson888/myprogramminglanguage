@@ -8,11 +8,11 @@ import com.tambapps.compiler.util.Symbol
 
 class CEvaluator extends Evaluator {
 
-  private final List<CFunction> cFunctions
+  private final Collection<CFunction> cFunctions
 
-  CEvaluator(List<TokenNode> functions, List<CFunction> cFunctions, Closure printer) {
+  CEvaluator(List<TokenNode> functions, Collection<CFunction> cFunctions, Closure printer) {
     super(functions, printer)
-    this.cFunctions = cFunctions
+    this.cFunctions = cFunctions.asUnmodifiable()
   }
 
   @Override
