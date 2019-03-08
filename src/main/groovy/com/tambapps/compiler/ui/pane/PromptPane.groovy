@@ -1,24 +1,29 @@
 package com.tambapps.compiler.ui.pane
 
-import com.tambapps.compiler.eval.console.Console
-import javafx.scene.input.KeyCode
+import com.tambapps.compiler.ui.style.Fonts
 
+import javax.swing.JTextField
 import javax.swing.border.EtchedBorder
-import javax.swing.event.DocumentEvent
-import java.awt.Color
 import java.awt.Dimension
-import java.awt.Font
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
 
-class PromptPane extends CodePane implements KeyListener {
+class PromptPane extends JTextField implements TextColoring, KeyListener {
 
-  Console console = new Console()
+  interface EnterListener {
+    //returns whether to clear or not text
+    boolean onEnterClick(String text)
+  }
 
-  PromptPane() {
+  final EnterListener enterListener
+
+  PromptPane(EnterListener enterListener) {
+    this.enterListener = enterListener
     setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null))
-    setFont(new Font(Font.SANS_SERIF, Font.BOLD, 16))
+    setFont(Fonts.CODE_FONT)
+    document.addDocumentListener(this)
     addKeyListener(this)
+    setMaximumSize(new Dimension(Integer.MAX_VALUE, 100))
   }
 
   @Override
@@ -35,7 +40,9 @@ class PromptPane extends CodePane implements KeyListener {
   @Override
   void keyReleased(KeyEvent keyEvent) {
     if (keyEvent.keyCode == KeyEvent.VK_ENTER) {
-      console.process()
+      if (enterListener.onEnterClick(text)) {
+        text = ""
+      }
     }
   }
 }

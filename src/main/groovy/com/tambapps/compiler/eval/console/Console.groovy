@@ -10,12 +10,11 @@ import com.tambapps.compiler.exception.EvaluationException
 import com.tambapps.compiler.exception.LexicalException
 import com.tambapps.compiler.exception.ParsingException
 
-//TODO HANDLE final variable and then make string variables for type (STRING = "string") etc
 class Console {
 
   private static final String FUNC_DEF_KEYWORD = 'def'
-  private static final String PROMPT = '> '
-  private static final String LINE_SEPARATOR = System.lineSeparator()
+  static final String PROMPT = '>   '
+  static final String LINE_SEPARATOR = System.lineSeparator()
 
   private final List<TokenNode> functions = []
   private final List<CFunction> cFunctions = []
@@ -51,22 +50,29 @@ class Console {
     println("Exited terminal")
   }
 
-  private void process(String line) {
+  //returns whether it has processed or is still waiting for next
+  boolean processLine(String line) {
     code += line
     code = code.trim()
-    int occOp = nbOcc(code, '{')
-    if (occOp > 0 && occOp != nbOcc(code, '}')) {
-      return
+    if (!isProcessable(code)) {
+      return false
     }
+    doProcess(code)
+    code = ''
+    return true
+  }
+
+  //returns whether the text can be processed, or more input is expected
+  static boolean isProcessable(String text) {
+    int occOp = nbOcc(text, '{')
+    return occOp == 0 || occOp == nbOcc(text, '}')
+  }
+
+  void doProcess(String code) {
     if (code.startsWith(FUNC_DEF_KEYWORD)) {
       process(code.substring(FUNC_DEF_KEYWORD.length()), true)
-      code = ''
     } else {
       process(code, false)
-      code = ''
-    }
-    if (running) {
-      print(PROMPT)
     }
   }
 

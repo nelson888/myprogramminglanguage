@@ -7,7 +7,6 @@ import com.tambapps.compiler.ui.panel.ConsolePanel
 
 import javax.swing.JFrame
 import javax.swing.JSplitPane
-import javax.swing.JTextPane
 import javax.swing.border.BevelBorder
 import javax.swing.border.SoftBevelBorder
 import java.awt.BorderLayout
@@ -28,8 +27,6 @@ splitPane.setOrientation(JSplitPane.VERTICAL_SPLIT)
 frame.getContentPane().add(splitPane, BorderLayout.CENTER)
 
 ConsolePanel consolePanel = new ConsolePanel()
-JTextPane outputPane = new JTextPane()
-outputPane.setEditable(false)
 splitPane.setTopComponent(consolePanel)
 CodeEditorPane editorPane = new CodeEditorPane()
 splitPane.setBottomComponent(editorPane)

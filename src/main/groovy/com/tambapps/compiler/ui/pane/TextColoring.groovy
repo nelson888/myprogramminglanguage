@@ -1,14 +1,9 @@
 package com.tambapps.compiler.ui.pane
 
-import javax.swing.JTextPane
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
-abstract class CodePane extends JTextPane implements DocumentListener {
-
-  CodePane() {
-    document.addDocumentListener(this)
-  }
+trait TextColoring implements DocumentListener {
 
   @Override
   void insertUpdate(DocumentEvent event) {
@@ -29,4 +24,5 @@ abstract class CodePane extends JTextPane implements DocumentListener {
   private void highlight(DocumentEvent event) {
     //TODO
   }
+
 }
