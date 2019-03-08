@@ -22,6 +22,14 @@ class CEvaluator extends Evaluator {
     if (function != null) { // function not found
       return functionCall(e, function)
     }
+    List argValues = e.childrenIterator()
+      .collect {this.&evaluate}
+
+    //TODO check  argTypes equality with a special equal method (any is equal to any type)
+    List<Symbol.Type> argTypes = argValues
+        .collect {Symbol.Type.&fromValue}
+
+
     CFunction cFunction = cFunctions.find { name == it.name }
     if (cFunction != null) {
       return cFunctionCall(cFunction, e)
