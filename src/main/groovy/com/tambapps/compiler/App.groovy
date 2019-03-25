@@ -13,8 +13,6 @@ import javax.swing.border.SoftBevelBorder
 import java.awt.BorderLayout
 
 def swing = new SwingBuilder()
-swing.registerBeanFactory( "consolePanel", ConsolePanel)
-swing.registerBeanFactory( "codeEditorPane", CodeEditorPane)
 swing.registerBeanFactory( "myToolbar", Toolbar)
 
 swing.edt {
@@ -22,8 +20,8 @@ swing.edt {
       JMenuBar: new Menubar()) {
     myToolbar(constraints: BorderLayout.NORTH)
     splitPane(border: new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null),
-        oneTouchExpandable: true, orientation: JSplitPane.VERTICAL_SPLIT, topComponent: new ConsolePanel(),
-        constraints: BorderLayout.CENTER,
-    bottomComponent: new CodeEditorPane())
+        oneTouchExpandable: true, orientation: JSplitPane.VERTICAL_SPLIT,
+        topComponent: new ConsolePanel(), bottomComponent: new CodeEditorPane(),
+        constraints: BorderLayout.CENTER)
   }
 }
