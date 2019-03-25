@@ -22,38 +22,32 @@ class CEvaluator extends Evaluator {
     if (function != null) { // function not found
       return functionCall(e, function)
     }
-    List argValues = e.childrenIterator()
-      .collect {this.&evaluate}
+    List argValues = e.childrenIterator().collect(this.&evaluate)
 
-    //TODO check  argTypes equality with a special equal method (any is equal to any type)
-    List<Symbol.Type> argTypes = argValues
-        .collect {Symbol.Type.&fromValue}
+    List<Symbol.Type> argTypes = argValues.collect(Symbol.Type.&fromValue)
 
-
-    CFunction cFunction = cFunctions.find { name == it.name }
-    if (cFunction != null) {
-      return cFunctionCall(cFunction, e)
+    Collection<CFunction> cFunctions = cFunctions.findAll { name == it.name }
+    if (!cFunctions) {
+      throw new EvaluationException("There isn't a function $name", e.l, e.c)
     }
-    throw new EvaluationException("Couldn't find function $name", e.l, e.c)
+    CFunction cFunction = cFunctions.find { equivalentTypes(argTypes, it.argTypes) }
+
+    if (cFunction == null) {
+      throw new EvaluationException("Can't call function $name with args $argTypes", e.l, e.c)
+    }
+
+    return cFunction.closure.call(*argValues)
   }
 
-  def cFunctionCall(CFunction function, TokenNode argsNode) {
-    int nbArgs = function.argTypes.size()
-    int nbChildren = argsNode.nbChildren()
-    if (nbChildren != nbArgs) {
-      throwArgsCountException(argsNode, nbArgs, nbChildren)
+  private static boolean equivalentTypes(List<Symbol.Type> types1, List<Symbol.Type> types2) {
+    if (types1.size() != types2.size()) {
+      return false
     }
-
-    List<Object> argValues = []
-    for (int i = 0; i < nbArgs; i++) {
-      Symbol.Type type = function.argTypes[i]
-      def argValueNode = argsNode.getChild(i)
-      def argValue = evaluate(argValueNode)
-      if (!type.isType(argValue)) {
-        throw new WrongTypeException(type, argValue, argValueNode)
+    for (int i = 0; i < types1.size(); i++) {
+      if (types1[i].compatible(types2[i])) {
+        return false
       }
-      argValues += argValue
     }
-    return function.closure.call(*argValues)
+    return true
   }
 }

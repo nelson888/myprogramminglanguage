@@ -120,6 +120,10 @@ class Symbol {
       return valueOf("ARR_" + t.name())
     }
 
+    boolean compatible(Type t) {
+      return ANY.is(t) || ANY.is(this) || this.is(t)
+    }
+
     Type elementType() {
       if (this == STRING) {
         return CHAR
