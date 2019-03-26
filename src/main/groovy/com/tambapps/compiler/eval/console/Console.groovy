@@ -1,5 +1,7 @@
 package com.tambapps.compiler.eval.console
 
+import com.tambapps.compiler.eval.EvalListener
+
 import static com.tambapps.compiler.eval.Evaluator.VOID
 
 import com.tambapps.compiler.analyzer.LexicalAnalyzer
@@ -129,4 +131,9 @@ class Console {
   void print(o) {
     printer(String.valueOf(o))
   }
+
+  void setEvalListener(EvalListener evalListener) {
+    evaluator.evalListener = evalListener
+  }
+
 }

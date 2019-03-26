@@ -1,5 +1,6 @@
 package com.tambapps.compiler.ui.panel
 
+import com.tambapps.compiler.eval.EvalListener
 import com.tambapps.compiler.eval.console.Console
 import com.tambapps.compiler.ui.pane.OutputPane
 import com.tambapps.compiler.ui.pane.PromptPane
@@ -13,7 +14,7 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
   private final Console console
   private final OutputPane outputPane
 
-  ConsolePanel() {
+  ConsolePanel(EvalListener evalListener) {
     setLayout(null)
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
     outputPane = new OutputPane()
@@ -24,6 +25,7 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
     outputPane.setMinimumSize(new Dimension(0, 400))
 
     console = new Console(outputPane.&appendText, outputPane.&appendText)
+    console.evalListener = evalListener
   }
 
   @Override
