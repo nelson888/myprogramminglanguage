@@ -1,10 +1,15 @@
 package com.tambapps.compiler.ui.model
 
+import com.tambapps.compiler.util.Symbol
+
 class VarData {
+
+  Symbol.Type type
   String name
   def value
 
-  VarData(String name, value) {
+  VarData(Symbol.Type type, String name, def value) {
+    this.type = type
     this.name = name
     this.value = value
   }
@@ -22,5 +27,16 @@ class VarData {
 
   int hashCode() {
     return (name != null ? name.hashCode() : 0)
+  }
+
+  def getAt(int i) {
+    switch (i) {
+      default:
+        return type
+      case 1:
+        return name
+      case 2:
+        return value
+    }
   }
 }

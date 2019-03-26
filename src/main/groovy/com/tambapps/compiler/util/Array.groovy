@@ -9,7 +9,6 @@ class Array {
 
   Type type
   final List array = new ArrayList()
-  final boolean isString
 
   @PackageScope
   Array(Type type, String s) {
@@ -70,14 +69,10 @@ class Array {
 
   @Override
   String toString() {
+    if (type == Type.CHAR) {
+      return array.inject("") {def a, def b -> a + b }
+    }
     return array
   }
 
-  @Override
-  boolean equals(Object o) {
-    if (o instanceof String) {
-
-    }
-    return super.equals(o)
-  }
 }
