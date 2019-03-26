@@ -26,7 +26,7 @@ class Evaluator {
   private DequeMap dequeMap
   private def returnValue = VOID
   private int nbSlot = 0
-
+  private EvalListener evalListener
 
   Evaluator(List<TokenNode> functions, Closure printer) {
     this.functions = functions
@@ -48,6 +48,7 @@ class Evaluator {
         s.slot = nbSlot++
         s.type = node.value.type
         s.value = s.type.defaultValue
+        evalListener?.onVarDecl(s.ident, s.value)
         return VOID
       case TokenNodeType.CONST_DECL:
         Symbol s = dequeMap.newSymbol(node.value.name)
@@ -55,6 +56,7 @@ class Evaluator {
         s.slot = nbSlot++
         s.type = node.value.type
         s.value = evaluate(node.getChild(0))
+        evalListener?.onVarDecl(s.ident, s.value)
         return s.value
       case TokenNodeType.TAB_DECL: //child => size
         String tabName = node.value.name
@@ -69,6 +71,7 @@ class Evaluator {
             s.value.append(defaultValue)
           }
         }
+        evalListener?.onVarDecl(s.ident, s.value)
         return VOID
       case TokenNodeType.BLOC:
         dequeMap.newBlock()
@@ -101,6 +104,7 @@ class Evaluator {
             throw new WrongTypeException(elementType, value, node)
           }
           array[index] = value
+          evalListener?.onVarAssign(s.ident, s.value)
           return value
         }
         if (left.type == TokenNodeType.D_REF) {
@@ -120,6 +124,7 @@ class Evaluator {
               node.l, node.c)
         }
         s.value = value
+        evalListener?.onVarAssign(s.ident, s.value)
         return value
       case TokenNodeType.COND:
         TokenNode condition = node.getChild(0)
@@ -360,4 +365,9 @@ class Evaluator {
   void clear(boolean variables, boolean functions) {
     dequeMap.clear(variables, functions)
   }
+
+  void setEvalListener(EvalListener evalListener) {
+    this.evalListener = evalListener
+  }
+
 }

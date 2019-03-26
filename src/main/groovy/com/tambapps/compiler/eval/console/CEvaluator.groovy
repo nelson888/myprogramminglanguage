@@ -3,7 +3,6 @@ package com.tambapps.compiler.eval.console
 import com.tambapps.compiler.analyzer.token.TokenNode
 import com.tambapps.compiler.eval.Evaluator
 import com.tambapps.compiler.exception.EvaluationException
-import com.tambapps.compiler.exception.WrongTypeException
 import com.tambapps.compiler.util.Symbol
 
 class CEvaluator extends Evaluator {
