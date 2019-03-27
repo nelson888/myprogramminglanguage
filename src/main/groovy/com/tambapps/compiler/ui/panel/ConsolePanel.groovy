@@ -14,7 +14,7 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
   private final Console console
   private final OutputPane outputPane
 
-  ConsolePanel(EvalListener evalListener) {
+  ConsolePanel() {
     setLayout(null)
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
     outputPane = new OutputPane()
@@ -25,7 +25,6 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
     outputPane.setMinimumSize(new Dimension(0, 400))
 
     console = new Console(outputPane.&appendText, outputPane.&appendText)
-    console.evalListener = evalListener
   }
 
   @Override
@@ -37,4 +36,9 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
     }
     return false
   }
+
+  void setEvalListener(EvalListener listener) {
+    console.evalListener = listener
+  }
+
 }

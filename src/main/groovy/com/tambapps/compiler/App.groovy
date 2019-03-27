@@ -8,18 +8,35 @@ import com.tambapps.compiler.ui.bar.Toolbar
 import com.tambapps.compiler.ui.panel.ConsolePanel
 import com.tambapps.compiler.util.Symbol
 import groovy.swing.SwingBuilder
+import javafx.scene.control.SplitPane
 
+import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.JSplitPane
+import javax.swing.JTable
 import javax.swing.border.BevelBorder
 import javax.swing.border.SoftBevelBorder
 import java.awt.BorderLayout
+import java.awt.Dimension
+import java.awt.Toolkit
 
 class App implements EvalListener, Menubar.ViewMenuListener {
 
+  private static final int WIDTH
+  private static final int HEIGHT
+
+  static {
+    Dimension dimension = Toolkit.defaultToolkit.screenSize
+    WIDTH = dimension.width * 0.5 * 0.5 as int
+    HEIGHT = dimension.height * 0.6 as int
+  }
+
   private VarsTableModel tableModel
   private JPanel tablePanel
+  private JSplitPane vertSplitPane
+  private JSplitPane horSplitPane
+  private CodeEditorPane editorPane
 
   static void main(String[] args) {
     new App()
@@ -29,26 +46,37 @@ class App implements EvalListener, Menubar.ViewMenuListener {
     def swing = new SwingBuilder()
     swing.registerBeanFactory( "myToolbar", Toolbar)
     swing.registerBeanFactory( "varsTableModel", VarsTableModel)
+    swing.registerBeanFactory( "consolePanel", ConsolePanel)
+    swing.registerBeanFactory( "codeEditorPane", CodeEditorPane)
 
+    final Dimension varTableDim = [WIDTH * 0.25 as int, HEIGHT * 0.25 as int]
     swing.edt {
-      frame(bounds: [100, 50, 900, 700], defaultCloseOperation: JFrame.EXIT_ON_CLOSE, show: true,
+      frame(size: [WIDTH, HEIGHT], defaultCloseOperation: JFrame.EXIT_ON_CLOSE, show: true,
           JMenuBar: new Menubar(this)) {
         borderLayout()
         myToolbar(constraints: BorderLayout.NORTH)
-        splitPane(border: new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null),
-            oneTouchExpandable: true, orientation: JSplitPane.VERTICAL_SPLIT,
-            topComponent: new ConsolePanel(this), bottomComponent: new CodeEditorPane(),
-            constraints: BorderLayout.CENTER)
-        tablePanel = panel(constraints: BorderLayout.EAST) {
-          scrollPane() {
-            table() {
-              tableModel = varsTableModel()
+        horSplitPane = splitPane(border: new SoftBevelBorder(BevelBorder.LOWERED, null, null, null, null),
+            oneTouchExpandable: true, orientation: JSplitPane.HORIZONTAL_SPLIT,
+            constraints: BorderLayout.CENTER) {
+          vertSplitPane = splitPane(orientation : JSplitPane.VERTICAL_SPLIT) {
+            consolePanel(evalListener: this).requestFocus()
+            editorPane = codeEditorPane()
+          }
+          tablePanel = panel() {
+            scrollPane(preferredSize : varTableDim) {
+              JTable table = table(preferredScrollableViewportSize : varTableDim) {
+                tableModel = varsTableModel()
+              }
+              table.columnModel.getColumn(0).maxWidth = varTableDim.width * 0.25 as int
+
             }
           }
         }
-
       }
     }
+
+    horSplitPane.dividerLocation = 0.7
+    vertSplitPane.dividerLocation = 0.7
   }
 
   @Override
@@ -63,11 +91,21 @@ class App implements EvalListener, Menubar.ViewMenuListener {
 
   @Override
   void onEditorItemClick() {
-
+    altVisibility(vertSplitPane, editorPane)
   }
 
   @Override
   void onTableItemClick() {
-    tablePanel.visible = !tablePanel.visible
+    altVisibility(horSplitPane, tablePanel)
+  }
+
+  private void altVisibility(JSplitPane splitPane, JComponent component) {
+    component.visible = !component.visible
+    if (component.visible) {
+      splitPane.dividerSize = 10
+      splitPane.dividerLocation = 0.7
+    } else {
+      splitPane.dividerSize = 0
+    }
   }
 }
