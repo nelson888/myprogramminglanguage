@@ -31,12 +31,12 @@ class VarData {
 
   def getAt(int i) {
     switch (i) {
-      default:
-        return type
       case 1:
         return name
       case 2:
         return value
+      default:
+        return type
     }
   }
 }
