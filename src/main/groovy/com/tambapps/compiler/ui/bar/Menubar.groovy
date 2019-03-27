@@ -1,5 +1,6 @@
 package com.tambapps.compiler.ui.bar
 
+import javax.swing.JFileChooser
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
@@ -11,6 +12,7 @@ class Menubar extends JMenuBar {
   interface ViewMenuListener {
     void onEditorItemClick()
     void onTableItemClick()
+    void onFileImported(String text)
   }
 
   private ViewMenuListener listener
@@ -21,13 +23,16 @@ class Menubar extends JMenuBar {
     add(viewMenu())
   }
 
-  private static JMenu fileMenu() {
+  private JMenu fileMenu() {
     JMenu menu = new JMenu("File")
     JMenuItem importFile = new JMenuItem("Import file...")
     importFile.addMouseListener(new MouseAdapter() {
       @Override
       void mousePressed(MouseEvent e) {
-        //TODO
+        JFileChooser chooser = new JFileChooser("Pick a file")
+        if (chooser.showOpenDialog(e.source) == JFileChooser.APPROVE_OPTION) {
+          listener.onFileImported(chooser.selectedFile.text)
+        }
       }
     })
     menu.add(importFile)

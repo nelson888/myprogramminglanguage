@@ -9,7 +9,6 @@ import com.tambapps.compiler.ui.bar.Toolbar
 import com.tambapps.compiler.ui.panel.ConsolePanel
 import com.tambapps.compiler.util.Symbol
 import groovy.swing.SwingBuilder
-import javafx.scene.control.SplitPane
 
 import javax.swing.JComponent
 import javax.swing.JFrame
@@ -103,7 +102,12 @@ class App implements EvalListener, Menubar.ViewMenuListener {
     altVisibility(horSplitPane, tablePanel)
   }
 
-  private void altVisibility(JSplitPane splitPane, JComponent component) {
+  @Override
+  void onFileImported(String text) {
+    editorPane.text = text
+  }
+
+  private static void altVisibility(JSplitPane splitPane, JComponent component) {
     component.visible = !component.visible
     if (component.visible) {
       splitPane.dividerSize = 10
