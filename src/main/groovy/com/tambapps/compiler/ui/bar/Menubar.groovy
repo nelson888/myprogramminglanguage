@@ -8,11 +8,18 @@ import java.awt.event.MouseEvent
 
 class Menubar extends JMenuBar {
 
-  Menubar() {
+  interface ViewMenuListener {
+    void onEditorItemClick()
+    void onTableItemClick()
+  }
+
+  private ViewMenuListener listener
+
+  Menubar(ViewMenuListener listener) {
+    this.listener = listener
     add(fileMenu())
     add(viewMenu())
   }
-
 
   private static JMenu fileMenu() {
     JMenu menu = new JMenu("File")
@@ -27,16 +34,24 @@ class Menubar extends JMenuBar {
     return menu
   }
 
-  private static JMenu viewMenu() {
+  private JMenu viewMenu() {
     JMenu menu = new JMenu("View")
-    JMenuItem showEditor = new JMenuItem("Show text editor")
+    JMenuItem showEditor = new JMenuItem("Show/hide text editor")
+    JMenuItem showTable = new JMenuItem("Show/hide variable table")
     showEditor.addMouseListener(new MouseAdapter() {
       @Override
       void mousePressed(MouseEvent e) {
-        //TODO
+        listener.onEditorItemClick()
+      }
+    })
+    showTable.addMouseListener(new MouseAdapter() {
+      @Override
+      void mouseReleased(MouseEvent mouseEvent) {
+        listener.onTableItemClick()
       }
     })
     menu.add(showEditor)
+    menu.add(showTable)
     return menu
   }
 }
