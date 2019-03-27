@@ -1,6 +1,7 @@
 package com.tambapps.compiler
 
 import com.tambapps.compiler.eval.EvalListener
+import com.tambapps.compiler.eval.console.Console
 import com.tambapps.compiler.ui.bar.Menubar
 import com.tambapps.compiler.ui.model.VarsTableModel
 import com.tambapps.compiler.ui.pane.CodeEditorPane
@@ -37,6 +38,7 @@ class App implements EvalListener, Menubar.ViewMenuListener {
   private JSplitPane vertSplitPane
   private JSplitPane horSplitPane
   private CodeEditorPane editorPane
+  private Console console
 
   static void main(String[] args) {
     new App()
@@ -59,7 +61,8 @@ class App implements EvalListener, Menubar.ViewMenuListener {
             oneTouchExpandable: true, orientation: JSplitPane.HORIZONTAL_SPLIT,
             constraints: BorderLayout.CENTER) {
           vertSplitPane = splitPane(orientation : JSplitPane.VERTICAL_SPLIT) {
-            consolePanel(evalListener: this).requestFocus()
+            ConsolePanel consolePanel = consolePanel(evalListener: this)
+            console = consolePanel.console
             editorPane = codeEditorPane()
           }
           tablePanel = panel() {
@@ -67,6 +70,7 @@ class App implements EvalListener, Menubar.ViewMenuListener {
               JTable table = table(preferredScrollableViewportSize : varTableDim) {
                 tableModel = varsTableModel()
               }
+              tableModel.table = table
               table.columnModel.getColumn(0).maxWidth = varTableDim.width * 0.25 as int
 
             }

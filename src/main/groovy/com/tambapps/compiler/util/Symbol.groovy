@@ -137,6 +137,21 @@ class Symbol {
       }
       return valueOf(name.replace("ARR_", ""))
     }
+
+    def parse(String s) throws IllegalArgumentException {
+      switch (this) {
+        case INT:
+          return Integer.parseInt(s)
+        case CHAR:
+          return s[0]
+        case FLOAT:
+          return Float.parseFloat(s)
+        case STRING:
+          return s
+        default:
+          throw new RuntimeException("//TODOOOO")
+      }
+    }
   }
 
   void setValue(def value) {

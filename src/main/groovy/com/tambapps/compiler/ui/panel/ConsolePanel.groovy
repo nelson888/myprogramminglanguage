@@ -41,4 +41,7 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
     console.evalListener = listener
   }
 
+  Console getConsole() {
+    return console
+  }
 }
