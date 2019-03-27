@@ -1,6 +1,7 @@
 package com.tambapps.compiler.ui.pane
 
 import com.tambapps.compiler.ui.style.Fonts
+import com.tambapps.compiler.ui.util.CommandHistory
 
 import javax.swing.JTextField
 import javax.swing.border.EtchedBorder
@@ -16,6 +17,7 @@ class PromptPane extends JTextField implements TextColoring, KeyListener {
   }
 
   final EnterListener enterListener
+  private final CommandHistory commandHistory = new CommandHistory()
 
   PromptPane(EnterListener enterListener) {
     this.enterListener = enterListener
@@ -29,7 +31,6 @@ class PromptPane extends JTextField implements TextColoring, KeyListener {
   @Override
   void keyTyped(KeyEvent keyEvent) {
 
-
   }
 
   @Override
@@ -39,10 +40,22 @@ class PromptPane extends JTextField implements TextColoring, KeyListener {
 
   @Override
   void keyReleased(KeyEvent keyEvent) {
-    if (keyEvent.keyCode == KeyEvent.VK_ENTER) {
-      if (enterListener.onEnterClick(text)) {
-        text = ""
-      }
+    switch (keyEvent.keyCode) {
+      case KeyEvent.VK_UP:
+      case KeyEvent.VK_DOWN:
+        String command = keyEvent.keyCode == KeyEvent.VK_UP ?
+            commandHistory.getUp() : commandHistory.getDown()
+        if (command != null) {
+          text = command
+        }
+        break
+      case KeyEvent.VK_ENTER:
+        if (enterListener.onEnterClick(text)) {
+          commandHistory.push(text)
+          text = ""
+        }
+        break
     }
+
   }
 }
