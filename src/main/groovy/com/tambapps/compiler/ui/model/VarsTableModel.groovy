@@ -12,7 +12,6 @@ class VarsTableModel extends AbstractTableModel {
 
   private int rows = 0
 
-  private JTable table
   private final List<VarData> varDatas = []
 
   void addRow(Symbol.Type type, String name, Object value) {
@@ -71,15 +70,11 @@ class VarsTableModel extends AbstractTableModel {
       v.value = v.type.parse(o)
       //TODO change variable value on console
     } catch (IllegalArgumentException e) {
-      JOptionPane.showMessageDialog(table,
+      JOptionPane.showMessageDialog(null,
           "'$o' is not well formated",
           'Format error',
           JOptionPane.ERROR_MESSAGE)
     }
-  }
-
-  void setTable(JTable table) {
-    this.table = table
   }
 
 }

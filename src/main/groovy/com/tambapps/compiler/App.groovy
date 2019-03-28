@@ -69,7 +69,6 @@ class App implements EvalListener, Menubar.ViewMenuListener {
               JTable table = table(preferredScrollableViewportSize : varTableDim) {
                 tableModel = varsTableModel()
               }
-              tableModel.table = table
               table.columnModel.getColumn(0).maxWidth = varTableDim.width * 0.25 as int
 
             }
