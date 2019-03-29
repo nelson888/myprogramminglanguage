@@ -3,20 +3,24 @@ package com.tambapps.compiler
 import com.tambapps.compiler.eval.EvalListener
 import com.tambapps.compiler.eval.console.Console
 import com.tambapps.compiler.ui.bar.Menubar
+import com.tambapps.compiler.ui.model.HistoryTableModel
 import com.tambapps.compiler.ui.model.VarsTableModel
 import com.tambapps.compiler.ui.pane.CodeEditorPane
 import com.tambapps.compiler.ui.bar.Toolbar
 import com.tambapps.compiler.ui.panel.ConsolePanel
+import com.tambapps.compiler.ui.util.CommandHistory
 import com.tambapps.compiler.util.Symbol
 import groovy.swing.SwingBuilder
 
 import javax.swing.JComponent
 import javax.swing.JFrame
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.border.BevelBorder
 import javax.swing.border.SoftBevelBorder
+import javax.swing.table.DefaultTableCellRenderer
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -32,7 +36,8 @@ class App implements EvalListener, Menubar.ViewMenuListener {
     HEIGHT = dimension.height * 0.6 as int
   }
 
-  private VarsTableModel tableModel
+  private VarsTableModel varsTableModel
+  private HistoryTableModel historyTableModel
   private JPanel tablePanel
   private JSplitPane vertSplitPane
   private JSplitPane horSplitPane
@@ -44,9 +49,12 @@ class App implements EvalListener, Menubar.ViewMenuListener {
   }
 
   App() {
+    final CommandsDequeList commandsDequeList = new CommandsDequeList()
+    final CommandHistory commandHistory = new CommandHistory(commandsDequeList)
     def swing = new SwingBuilder()
     swing.registerBeanFactory( "myToolbar", Toolbar)
     swing.registerBeanFactory( "varsTableModel", VarsTableModel)
+    swing.registerBeanFactory( "historyTableModel", HistoryTableModel)
     swing.registerBeanFactory( "consolePanel", ConsolePanel)
     swing.registerBeanFactory( "codeEditorPane", CodeEditorPane)
 
@@ -60,35 +68,44 @@ class App implements EvalListener, Menubar.ViewMenuListener {
             oneTouchExpandable: true, orientation: JSplitPane.HORIZONTAL_SPLIT,
             constraints: BorderLayout.CENTER) {
           vertSplitPane = splitPane(orientation : JSplitPane.VERTICAL_SPLIT) {
-            ConsolePanel consolePanel = consolePanel(evalListener: this)
+            ConsolePanel consolePanel = consolePanel(evalListener: this, commandHistory: commandHistory)
             console = consolePanel.console
             editorPane = codeEditorPane()
           }
           tablePanel = panel() {
-            scrollPane(preferredSize : varTableDim) {
-              JTable table = table(preferredScrollableViewportSize : varTableDim) {
-                tableModel = varsTableModel()
+            vbox() {
+              scrollPane(preferredSize : varTableDim) {
+                JTable table = table(preferredScrollableViewportSize : varTableDim) {
+                  varsTableModel = varsTableModel()
+                }
+                table.columnModel.getColumn(0).maxWidth = varTableDim.width * 0.25 as int
               }
-              table.columnModel.getColumn(0).maxWidth = varTableDim.width * 0.25 as int
 
+              scrollPane(preferredSize : varTableDim) {
+                JTable table = table(preferredScrollableViewportSize : varTableDim) {
+                  historyTableModel = historyTableModel(commands: commandsDequeList.asUnmodifiable())
+                }
+                DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer()
+                centerRenderer.setHorizontalAlignment(JLabel.CENTER)
+                table.setDefaultRenderer(Object.class, centerRenderer)
+              }
             }
           }
         }
       }
     }
-
     horSplitPane.dividerLocation = 0.7
     vertSplitPane.dividerLocation = 0.7
   }
 
   @Override
   void onVarDecl(Symbol.Type type, String name, Object value) {
-    tableModel.addRow(type, name, value)
+    varsTableModel.addRow(type, name, value)
   }
 
   @Override
   void onVarAssign(Symbol.Type type, String name, Object value) {
-    tableModel.setValueOf(name, value)
+    varsTableModel.setValueOf(name, value)
   }
 
   @Override
@@ -113,6 +130,25 @@ class App implements EvalListener, Menubar.ViewMenuListener {
       splitPane.dividerLocation = 0.7
     } else {
       splitPane.dividerSize = 0
+    }
+  }
+
+  class CommandsDequeList extends LinkedList<String> {
+
+    @Override
+    String removeFirst() {
+      try {
+        return super.removeFirst()
+      } finally {
+        App.this.historyTableModel.fireTableRowsDeleted(0, 0)
+
+      }
+    }
+
+    @Override
+    void addLast(String s) {
+      super.addLast(s)
+      App.this.historyTableModel.fireTableRowsInserted(size() - 1, size())
     }
   }
 }

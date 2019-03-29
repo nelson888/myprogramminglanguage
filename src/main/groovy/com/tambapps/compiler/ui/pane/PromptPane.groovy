@@ -17,7 +17,7 @@ class PromptPane extends JTextField implements TextColoring, KeyListener {
   }
 
   final EnterListener enterListener
-  private final CommandHistory commandHistory = new CommandHistory()
+  CommandHistory commandHistory
 
   PromptPane(EnterListener enterListener) {
     this.enterListener = enterListener

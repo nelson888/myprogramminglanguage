@@ -4,6 +4,7 @@ import com.tambapps.compiler.eval.EvalListener
 import com.tambapps.compiler.eval.console.Console
 import com.tambapps.compiler.ui.pane.OutputPane
 import com.tambapps.compiler.ui.pane.PromptPane
+import com.tambapps.compiler.ui.util.CommandHistory
 
 import javax.swing.BoxLayout
 import javax.swing.JPanel
@@ -13,13 +14,13 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
 
   private final Console console
   private final OutputPane outputPane
+  private final PromptPane promptPane
 
   ConsolePanel() {
-    setLayout(null)
     setLayout(new BoxLayout(this, BoxLayout.Y_AXIS))
     outputPane = new OutputPane()
     add(outputPane)
-    PromptPane promptPane = new PromptPane(this)
+    promptPane = new PromptPane(this)
     add(promptPane)
     setMinimumSize(new Dimension(0, 500))
     outputPane.setMinimumSize(new Dimension(0, 400))
@@ -44,4 +45,9 @@ class ConsolePanel extends JPanel implements PromptPane.EnterListener {
   Console getConsole() {
     return console
   }
+
+  void setCommandHistory(CommandHistory commandHistory) {
+    promptPane.commandHistory = commandHistory
+  }
+
 }

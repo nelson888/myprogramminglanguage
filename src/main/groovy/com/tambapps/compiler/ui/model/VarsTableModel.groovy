@@ -8,21 +8,18 @@ import javax.swing.table.AbstractTableModel
 
 class VarsTableModel extends AbstractTableModel {
 
-  private static final String[] COLUMN_TITLES = ["type", "variable", "value"]
-
-  private int rows = 0
+  private static final String[] COLUMN_TITLES = ['type', 'variable', 'value']
 
   private final List<VarData> varDatas = []
 
   void addRow(Symbol.Type type, String name, Object value) {
     varDatas.add(new VarData(type, name, value))
-    rows++
-    fireTableRowsInserted(rows - 1, rows)
+    fireTableRowsInserted(rowCount - 1, rowCount)
   }
 
   @Override
   int getRowCount() {
-    return rows
+    return varDatas.size()
   }
 
   @Override
