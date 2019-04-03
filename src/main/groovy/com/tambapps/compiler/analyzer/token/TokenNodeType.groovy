@@ -13,7 +13,7 @@ enum TokenNodeType {
   PROG, BLOC, SEQ, FUNCTION, FUNCTION_CALL, RETURN,D_REF,
   PRINT,
   TAB_DECL, TAB_REF,
-  INT, CHAR, STRING, FLOAT, ARRAY; //TODO parse array like [1, 2, 3]
+  INT, CHAR, STRING, FLOAT, ARRAY;
 
   boolean isUnaryOperator() {
     return this in [PLUS_U, MINUS_U, NOT]
