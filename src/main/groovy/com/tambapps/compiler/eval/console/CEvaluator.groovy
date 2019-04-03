@@ -43,7 +43,7 @@ class CEvaluator extends Evaluator {
       return false
     }
     for (int i = 0; i < types1.size(); i++) {
-      if (types1[i].compatible(types2[i])) {
+      if (!types1[i].compatible(types2[i])) {
         return false
       }
     }
