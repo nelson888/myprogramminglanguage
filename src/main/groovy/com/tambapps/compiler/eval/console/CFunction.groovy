@@ -2,7 +2,6 @@ package com.tambapps.compiler.eval.console
 
 import com.tambapps.compiler.util.Symbol
 
-//TODO allow function overloading
 class CFunction {
 
   final String name

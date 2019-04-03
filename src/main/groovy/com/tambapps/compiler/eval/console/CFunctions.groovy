@@ -15,6 +15,7 @@ final class CFunctions {
     def clearVars = { evaluator.clear(true, false); VOID }
     def clearFuncs = { evaluator.clear(false, true); VOID }
     def clearAll = { evaluator.clear(true, true); VOID }
+    //handle function overloading
     return [
         new CFunction("listVars", [], listVariables),
         new CFunction("listFuncs", [], listFunctions),
